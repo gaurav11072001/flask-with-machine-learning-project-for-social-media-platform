@@ -1,0 +1,278 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block page_title %}Dashboard Overview{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Stats Cards -->
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-primary shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total Users</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ stats.total_users }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-users fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+                <div class="mt-2">
+                    <small class="text-success">+{{ stats.recent_users }} this week</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-success shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Total Posts</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ stats.total_posts }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-images fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+                <div class="mt-2">
+                    <small class="text-success">+{{ stats.recent_posts }} this week</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-warning shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Flagged Content</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">
+                            {{ stats.flagged_posts + stats.flagged_comments + stats.flagged_messages }}
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-exclamation-triangle fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+                <div class="mt-2">
+                    <small class="text-warning">+{{ stats.recent_flagged }} this week</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-info shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Total Messages</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ stats.total_messages }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-comments fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card shadow">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Quick Actions</h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3 mb-3">
+                        <a href="{{ url_for('admin_blocked_words') }}" class="btn btn-outline-danger btn-block w-100">
+                            <i class="fas fa-ban fa-2x mb-2"></i><br>
+                            <strong>Blocked Words</strong><br>
+                            <small>Manage content filters</small>
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <a href="{{ url_for('admin_users') }}" class="btn btn-outline-primary btn-block w-100">
+                            <i class="fas fa-users fa-2x mb-2"></i><br>
+                            <strong>User Management</strong><br>
+                            <small>Manage user accounts</small>
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <a href="{{ url_for('admin_posts') }}" class="btn btn-outline-warning btn-block w-100">
+                            <i class="fas fa-images fa-2x mb-2"></i><br>
+                            <strong>Post Moderation</strong><br>
+                            <small>Review flagged posts</small>
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <a href="{{ url_for('admin_chat_monitor') }}" class="btn btn-outline-success btn-block w-100">
+                            <i class="fas fa-eye fa-2x mb-2"></i><br>
+                            <strong>Chat Monitor</strong><br>
+                            <small>Monitor flagged messages</small>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Flagged Posts -->
+    <div class="col-lg-6 mb-4">
+        <div class="card shadow">
+            <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                <h6 class="m-0 font-weight-bold text-primary">Recent Flagged Posts</h6>
+                <a href="{{ url_for('admin_posts', flagged='true') }}" class="btn btn-sm btn-outline-primary">
+                    View All
+                </a>
+            </div>
+            <div class="card-body">
+                {% if stats.latest_flagged_posts %}
+                    <div class="list-group list-group-flush">
+                        {% for post in stats.latest_flagged_posts %}
+                        <div class="list-group-item px-0">
+                            <div class="d-flex align-items-center">
+                                <div class="flex-shrink-0">
+                                    <img src="{{ url_for('uploaded_file', filename='posts/' + post.image_filename) }}" 
+                                         class="rounded" width="50" height="50" style="object-fit: cover;">
+                                </div>
+                                <div class="flex-grow-1 ms-3">
+                                    <h6 class="mb-1">@{{ post.author.username }}</h6>
+                                    <p class="mb-1 text-muted small">
+                                        {{ (post.caption[:50] + '...') if post.caption and post.caption|length > 50 else (post.caption or 'No caption') }}
+                                    </p>
+                                    <small class="text-danger">
+                                        <i class="fas fa-flag me-1"></i>{{ post.flagged_keywords or 'Flagged by system' }}
+                                    </small>
+                                </div>
+                                <small class="text-muted">{{ moment(post.timestamp).fromNow() }}</small>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
+                        <p class="text-muted">No flagged posts found</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Flagged Messages -->
+    <div class="col-lg-6 mb-4">
+        <div class="card shadow">
+            <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                <h6 class="m-0 font-weight-bold text-primary">Recent Flagged Messages</h6>
+                <a href="{{ url_for('admin_messages', flagged='true') }}" class="btn btn-sm btn-outline-primary">
+                    View All
+                </a>
+            </div>
+            <div class="card-body">
+                {% if stats.latest_flagged_messages %}
+                    <div class="list-group list-group-flush">
+                        {% for message in stats.latest_flagged_messages %}
+                        <div class="list-group-item px-0">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div class="ms-2 me-auto">
+                                    <div class="fw-bold">@{{ message.author.username }}</div>
+                                    <p class="mb-1 text-muted small">
+                                        {{ (message.content[:80] + '...') if message.content|length > 80 else message.content }}
+                                    </p>
+                                    <small class="text-danger">
+                                        <i class="fas fa-flag me-1"></i>{{ message.flagged_keywords or 'Flagged by system' }}
+                                    </small>
+                                </div>
+                                <small class="text-muted">{{ moment(message.timestamp).fromNow() }}</small>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
+                        <p class="text-muted">No flagged messages found</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- System Status -->
+<div class="row">
+    <div class="col-12">
+        <div class="card shadow">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Quick Stats</h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="text-center">
+                            <div class="progress mb-2" style="height: 6px;">
+                                {% set flagged_posts_rate = (stats.flagged_posts / stats.total_posts * 100) if stats.total_posts > 0 else 0 %}
+                                <div class="progress-bar bg-danger" role="progressbar" 
+                                     style="width: {{ flagged_posts_rate }}%">
+                                </div>
+                            </div>
+                            <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">Flagged Posts Rate</div>
+                            <div class="h6 mb-0 font-weight-bold text-gray-800">
+                                {{ "%.1f"|format(flagged_posts_rate) }}%
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="text-center">
+                            <div class="progress mb-2" style="height: 6px;">
+                                {% set flagged_comments_rate = (stats.flagged_comments / stats.total_comments * 100) if stats.total_comments > 0 else 0 %}
+                                <div class="progress-bar bg-warning" role="progressbar" 
+                                     style="width: {{ flagged_comments_rate }}%">
+                                </div>
+                            </div>
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Flagged Comments Rate</div>
+                            <div class="h6 mb-0 font-weight-bold text-gray-800">
+                                {{ "%.1f"|format(flagged_comments_rate) }}%
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="text-center">
+                            <div class="progress mb-2" style="height: 6px;">
+                                {% set flagged_messages_rate = (stats.flagged_messages / stats.total_messages * 100) if stats.total_messages > 0 else 0 %}
+                                <div class="progress-bar bg-info" role="progressbar" 
+                                     style="width: {{ flagged_messages_rate }}%">
+                                </div>
+                            </div>
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Flagged Messages Rate</div>
+                            <div class="h6 mb-0 font-weight-bold text-gray-800">
+                                {{ "%.1f"|format(flagged_messages_rate) }}%
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Auto-refresh dashboard every 30 seconds
+setTimeout(function() {
+    window.location.reload();
+}, 30000);
+</script>
+{% endblock %}

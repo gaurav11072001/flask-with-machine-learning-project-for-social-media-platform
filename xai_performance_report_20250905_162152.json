@@ -1,0 +1,471 @@
+{
+  "performance_metrics": {
+    "timestamp": "2025-09-05T16:21:52.571938",
+    "basic_metrics": {
+      "accuracy": 0.9222222222222223,
+      "balanced_accuracy": 0.9222222222222223,
+      "precision": {
+        "macro": 0.9542483660130718,
+        "micro": 0.9222222222222223,
+        "weighted": 0.9542483660130718
+      },
+      "recall": {
+        "macro": 0.9222222222222223,
+        "micro": 0.9222222222222223,
+        "weighted": 0.9222222222222223
+      },
+      "f1_score": {
+        "macro": 0.9276564205719124,
+        "micro": 0.9222222222222223,
+        "weighted": 0.9276564205719124
+      }
+    },
+    "advanced_metrics": {
+      "cohen_kappa": 0.9125,
+      "matthews_correlation": 0.9165685231151417,
+      "roc_auc": {
+        "macro": 0.9978858024691358,
+        "weighted": 0.9978858024691358
+      }
+    },
+    "class_metrics": {
+      "cyberbullying": {
+        "precision": 1.0,
+        "recall": 0.7333333333333333,
+        "f1_score": 0.846153846153846,
+        "support": 30
+      },
+      "financial_fraud": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1_score": 1.0,
+        "support": 30
+      },
+      "identity_theft": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1_score": 1.0,
+        "support": 30
+      },
+      "illegal_drugs": {
+        "precision": 1.0,
+        "recall": 0.9333333333333333,
+        "f1_score": 0.9655172413793104,
+        "support": 30
+      },
+      "phishing": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1_score": 1.0,
+        "support": 30
+      },
+      "romance_scam": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1_score": 1.0,
+        "support": 30
+      },
+      "safe": {
+        "precision": 0.5882352941176471,
+        "recall": 1.0,
+        "f1_score": 0.7407407407407407,
+        "support": 30
+      },
+      "threats_violence": {
+        "precision": 1.0,
+        "recall": 0.7666666666666667,
+        "f1_score": 0.8679245283018869,
+        "support": 30
+      },
+      "weapons_trafficking": {
+        "precision": 1.0,
+        "recall": 0.8666666666666667,
+        "f1_score": 0.9285714285714286,
+        "support": 30
+      }
+    },
+    "confusion_matrix": {
+      "matrix": [
+        [
+          22,
+          0,
+          0,
+          0,
+          0,
+          0,
+          8,
+          0,
+          0
+        ],
+        [
+          0,
+          30,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          30,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          28,
+          0,
+          0,
+          2,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          30,
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          30,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          30,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          7,
+          23,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          4,
+          0,
+          26
+        ]
+      ],
+      "labels": [
+        "cyberbullying",
+        "financial_fraud",
+        "identity_theft",
+        "illegal_drugs",
+        "phishing",
+        "romance_scam",
+        "safe",
+        "threats_violence",
+        "weapons_trafficking"
+      ],
+      "normalized": [
+        [
+          0.7333333333333333,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.26666666666666666,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.9333333333333333,
+          0.0,
+          0.0,
+          0.06666666666666667,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.23333333333333334,
+          0.7666666666666667,
+          0.0
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.13333333333333333,
+          0.0,
+          0.8666666666666667
+        ]
+      ]
+    },
+    "dataset_info": {
+      "test_samples": 270,
+      "train_samples": 1080,
+      "classes": 9,
+      "class_names": [
+        "cyberbullying",
+        "financial_fraud",
+        "identity_theft",
+        "illegal_drugs",
+        "phishing",
+        "romance_scam",
+        "safe",
+        "threats_violence",
+        "weapons_trafficking"
+      ],
+      "class_distribution": {
+        "romance_scam": 0.1111111111111111,
+        "identity_theft": 0.1111111111111111,
+        "financial_fraud": 0.1111111111111111,
+        "weapons_trafficking": 0.1111111111111111,
+        "safe": 0.1111111111111111,
+        "threats_violence": 0.1111111111111111,
+        "illegal_drugs": 0.1111111111111111,
+        "phishing": 0.1111111111111111,
+        "cyberbullying": 0.1111111111111111
+      }
+    },
+    "cross_validation": {
+      "accuracy": {
+        "mean": 0.913888888888889,
+        "std": 0.01819155805961898,
+        "scores": [
+          0.8935185185185185,
+          0.9074074074074074,
+          0.9305555555555556,
+          0.8981481481481481,
+          0.9398148148148148
+        ],
+        "confidence_interval": [
+          0.877505772769651,
+          0.9502720050081269
+        ]
+      },
+      "precision": {
+        "mean": 0.9502356066185854,
+        "std": 0.008247662095875576,
+        "scores": [
+          0.9456264775413712,
+          0.9494949494949494,
+          0.9572649572649572,
+          0.9378306878306878,
+          0.9609609609609611
+        ],
+        "confidence_interval": [
+          0.9337402824268343,
+          0.9667309308103366
+        ]
+      },
+      "recall": {
+        "mean": 0.913888888888889,
+        "std": 0.01819155805961902,
+        "scores": [
+          0.8935185185185185,
+          0.9074074074074076,
+          0.9305555555555556,
+          0.898148148148148,
+          0.9398148148148149
+        ],
+        "confidence_interval": [
+          0.8775057727696509,
+          0.950272005008127
+        ]
+      },
+      "f1": {
+        "mean": 0.9202251825235134,
+        "std": 0.016474588695009153,
+        "scores": [
+          0.9003059461950106,
+          0.9157701147320716,
+          0.935332622289144,
+          0.9065656565656567,
+          0.9431515728356844
+        ],
+        "confidence_interval": [
+          0.887276005133495,
+          0.9531743599135317
+        ]
+      }
+    },
+    "model_info": {
+      "model_type": "RandomForestClassifier",
+      "features_count": 1234,
+      "has_feature_importance": true
+    }
+  },
+  "performance_summary": {
+    "overall_performance": "Very Good (A)",
+    "key_strengths": [
+      "Excellent overall accuracy",
+      "Well-balanced performance across classes",
+      "Good precision-recall balance"
+    ],
+    "areas_for_improvement": [],
+    "recommendations": []
+  },
+  "threat_detection_stats": {
+    "safe_classification": {
+      "precision": 0.5882352941176471,
+      "recall": 1.0,
+      "f1_score": 0.7407407407407407
+    },
+    "threat_categories": {
+      "cyberbullying": {
+        "precision": 1.0,
+        "recall": 0.7333333333333333,
+        "f1_score": 0.846153846153846,
+        "support": 30
+      },
+      "financial_fraud": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1_score": 1.0,
+        "support": 30
+      },
+      "identity_theft": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1_score": 1.0,
+        "support": 30
+      },
+      "illegal_drugs": {
+        "precision": 1.0,
+        "recall": 0.9333333333333333,
+        "f1_score": 0.9655172413793104,
+        "support": 30
+      },
+      "phishing": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1_score": 1.0,
+        "support": 30
+      },
+      "romance_scam": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1_score": 1.0,
+        "support": 30
+      },
+      "threats_violence": {
+        "precision": 1.0,
+        "recall": 0.7666666666666667,
+        "f1_score": 0.8679245283018869,
+        "support": 30
+      },
+      "weapons_trafficking": {
+        "precision": 1.0,
+        "recall": 0.8666666666666667,
+        "f1_score": 0.9285714285714286,
+        "support": 30
+      }
+    },
+    "overall_threat_detection": {
+      "avg_precision": 1.0,
+      "avg_recall": 0.9125000000000001,
+      "avg_f1": 0.9510208805508089
+    },
+    "false_positive_rate": 0.4117647058823529,
+    "false_negative_rate": 0.0
+  }
+}

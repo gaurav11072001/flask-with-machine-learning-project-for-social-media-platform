@@ -1,0 +1,67 @@
+{
+  "total_samples": 4500,
+  "categories": {
+    "financial_fraud": 500,
+    "phishing": 500,
+    "threats_violence": 500,
+    "cyberbullying": 500,
+    "illegal_drugs": 500,
+    "weapons_trafficking": 500,
+    "identity_theft": 500,
+    "romance_scam": 500,
+    "safe": 500
+  },
+  "generation_date": "2026-01-31T20:23:22.225413",
+  "feature_columns": [
+    "id",
+    "text",
+    "category",
+    "severity",
+    "is_cybercrime",
+    "timestamp",
+    "word_count",
+    "char_count",
+    "contains_urls",
+    "contains_money_terms",
+    "contains_urgency",
+    "threat_level"
+  ],
+  "category_descriptions": {
+    "financial_fraud": {
+      "severity": "high",
+      "description": "Financial scams, money transfer requests, fake investment schemes"
+    },
+    "phishing": {
+      "severity": "high",
+      "description": "Attempts to steal personal information, login credentials"
+    },
+    "threats_violence": {
+      "severity": "critical",
+      "description": "Physical threats, violence, intimidation"
+    },
+    "cyberbullying": {
+      "severity": "medium",
+      "description": "Online harassment, bullying, hate speech"
+    },
+    "illegal_drugs": {
+      "severity": "high",
+      "description": "Drug trafficking, illegal substance sales"
+    },
+    "weapons_trafficking": {
+      "severity": "critical",
+      "description": "Illegal weapons sales, trafficking"
+    },
+    "identity_theft": {
+      "severity": "high",
+      "description": "Stealing personal information, identity fraud"
+    },
+    "romance_scam": {
+      "severity": "medium",
+      "description": "Fake romantic relationships for financial gain"
+    },
+    "safe": {
+      "severity": "none",
+      "description": "Normal, safe conversations"
+    }
+  }
+}

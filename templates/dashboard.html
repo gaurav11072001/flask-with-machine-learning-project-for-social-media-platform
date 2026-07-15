@@ -1,0 +1,318 @@
+{% extends "base.html" %}
+
+{% block title %}Share Hub - {{ current_user.username }} | INSTAShare{% endblock %}
+
+{% block content %}
+<div class="dashboard-container-modern px-3">
+    <div class="container-fluid h-100 px-0">
+        <div class="row h-100 g-0">
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2 d-none d-md-block border-end border-glass">
+                <div class="sidebar-modern h-100 d-flex flex-column">
+                    <div class="sidebar-header-modern p-4">
+                        <h5 class="text-white mb-0 uppercase tracking-widest font-weight-800">
+                            <i class="fas fa-layer-group me-2 text-primary"></i>Neural <span
+                                class="text-gradient">Hub</span>
+                        </h5>
+                    </div>
+
+                    <div class="sidebar-menu-modern p-3">
+                        <a href="{{ url_for('feed') }}" class="sidebar-link-modern active mb-2">
+                            <i class="fas fa-tower-broadcast"></i>
+                            <span>Communications</span>
+                        </a>
+                        <a href="{{ url_for('people') }}" class="sidebar-link-modern mb-2">
+                            <i class="fas fa-users-viewfinder"></i>
+                            <span>Discover Units</span>
+                        </a>
+                        <a href="{{ url_for('xai_dashboard') }}" class="sidebar-link-modern mb-2">
+                            <i class="fas fa-shield-halved"></i>
+                            <span>Security Core</span>
+                        </a>
+                        <a href="{{ url_for('edit_profile') }}" class="sidebar-link-modern">
+                            <i class="fas fa-microchip"></i>
+                            <span>Parameters</span>
+                        </a>
+                    </div>
+
+                    <div class="sidebar-footer-modern mt-auto p-4 border-top border-glass">
+                        <div class="user-identity-card d-flex align-items-center gap-3">
+                            <div class="avatar-mini-glow">
+                                {{ current_user.username[0].upper() }}
+                            </div>
+                            <div class="identity-info">
+                                <div class="identity-name text-white small fw-bold">{{ current_user.username }}</div>
+                                <div class="identity-status small"><span class="pulse-dot-sm"></span> Active</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-md-9 col-lg-10">
+                <div class="main-viewport-modern p-4 p-lg-5">
+                    <!-- Header -->
+                    <div class="viewport-header-modern mb-5" data-aos="fade-down">
+                        <div class="d-flex justify-content-between align-items-end">
+                            <div>
+                                <h2 class="text-white fw-bold mb-1">Access Granted, {{ current_user.username }}.</h2>
+                                <p class="text-muted mb-0">Synchronizing secure network signals...</p>
+                            </div>
+                            <div class="viewport-actions d-flex gap-3">
+                                <a href="{{ url_for('upload') }}"
+                                    class="btn btn-primary rounded-pill px-4 fw-bold shadow-glow">
+                                    <i class="fas fa-plus-circle me-2"></i>Broadcast Signal
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Security Status -->
+                    <div class="security-alert-modern mb-5" data-aos="fade-up">
+                        <div class="glass-banner p-4 rounded-4 d-flex align-items-center">
+                            <div class="alert-icon-wrapper me-4">
+                                <i class="fas fa-shield-heart text-primary fs-3"></i>
+                            </div>
+                            <div class="alert-content flex-grow-1">
+                                <h6 class="text-white mb-1">Cyber-Shield Engagement: <span
+                                        class="text-primary fw-bold">100%</span></h6>
+                                <p class="text-muted small mb-0">Autonomous AI sentinels are currently filtering all
+                                    incoming transmission packets for integrity.</p>
+                            </div>
+                            <div class="alert-meta d-none d-sm-block">
+                                <span
+                                    class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 px-3 py-2">
+                                    <i class="fas fa-check-circle me-1"></i>System Normal
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Users List -->
+                    <div class="content-section-modern">
+                        <div class="section-title-modern mb-4">
+                            <h4 class="text-white fw-bold">Verified Network Units</h4>
+                            <p class="text-muted small">Establish end-to-end encrypted links with other identifiers</p>
+                        </div>
+
+                        {% if users %}
+                        <div class="row g-4">
+                            {% for user in users %}
+                            <div class="col-md-6 col-lg-4" data-aos="zoom-in" data-aos-delay="{{ loop.index0 * 50 }}">
+                                <div class="identity-unit-card transition">
+                                    <div class="unit-card-header mb-3">
+                                        <div class="unit-avatar-wrapper">
+                                            <div class="unit-avatar">
+                                                {{ user.username[0].upper() }}
+                                            </div>
+                                            <div class="unit-status-dot online"></div>
+                                        </div>
+                                    </div>
+                                    <div class="unit-card-body">
+                                        <h6 class="text-white fw-bold mb-1">{{ user.username }}</h6>
+                                        <div class="unit-meta d-flex gap-3 mb-3">
+                                            <span class="small text-secondary"><i
+                                                    class="fas fa-circle-check text-primary me-1"></i>Online</span>
+                                            <span class="small text-secondary"><i class="fas fa-clock me-1"></i>ID: {{
+                                                user.id }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="unit-card-footer mt-auto">
+                                        <a href="{{ url_for('chat', username=user.username) }}"
+                                            class="btn btn-glass btn-sm w-100 rounded-pill py-2">
+                                            <i class="fas fa-bolt-lightning me-2 text-primary"></i>Initiate Secure Chat
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <div class="empty-vector text-center py-5">
+                            <div class="vector-icon mb-3 opacity-25">
+                                <i class="fas fa-radar text-secondary" style="font-size: 4rem;"></i>
+                            </div>
+                            <h5 class="text-secondary mb-2">Direct Links Unavailable</h5>
+                            <p class="text-secondary small mb-4">No active identifiers detected within your current
+                                sector.
+                            </p>
+                            <button class="btn btn-outline-primary rounded-pill px-4">
+                                <i class="fas fa-satellite-dish me-2"></i>Pulse Invitation
+                            </button>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .dashboard-container-modern {
+        background: var(--bg-deep);
+        min-height: 100vh;
+        padding-top: 76px;
+    }
+
+    .border-glass {
+        border-color: var(--glass-border) !important;
+    }
+
+    .sidebar-modern {
+        background: rgba(10, 10, 12, 0.4);
+        backdrop-filter: blur(10px);
+    }
+
+    .sidebar-link-modern {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 12px 20px;
+        color: var(--text-secondary);
+        text-decoration: none;
+        border-radius: 12px;
+        transition: var(--transition);
+        font-weight: 500;
+    }
+
+    .sidebar-link-modern:hover,
+    .sidebar-link-modern.active {
+        background: rgba(139, 92, 246, 0.1);
+        color: var(--text-main);
+    }
+
+    .sidebar-link-modern i {
+        font-size: 1.1rem;
+        width: 20px;
+        text-align: center;
+    }
+
+    .avatar-mini-glow {
+        width: 40px;
+        height: 40px;
+        background: var(--gradient-primary);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 800;
+        box-shadow: 0 0 15px rgba(139, 92, 246, 0.3);
+    }
+
+    .glass-banner {
+        background: var(--bg-card);
+        border: 1px solid var(--glass-border);
+        backdrop-filter: blur(10px);
+    }
+
+    .alert-icon-wrapper {
+        width: 60px;
+        height: 60px;
+        background: rgba(139, 92, 246, 0.1);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid rgba(139, 92, 246, 0.2);
+    }
+
+    .identity-unit-card {
+        background: var(--bg-card);
+        border: 1px solid var(--glass-border);
+        border-radius: var(--border-radius);
+        padding: 30px;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        backdrop-filter: blur(10px);
+    }
+
+    .identity-unit-card:hover {
+        transform: translateY(-5px);
+        border-color: var(--primary-color);
+        box-shadow: var(--shadow-glow);
+    }
+
+    .unit-avatar-wrapper {
+        position: relative;
+        width: 80px;
+        height: 80px;
+    }
+
+    .unit-avatar {
+        width: 100%;
+        height: 100%;
+        background: var(--gradient-primary);
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 2rem;
+        font-weight: 800;
+    }
+
+    .unit-status-dot {
+        position: absolute;
+        bottom: -5px;
+        right: -5px;
+        width: 18px;
+        height: 18px;
+        background: #10b981;
+        border: 3px solid var(--bg-card);
+        border-radius: 50%;
+    }
+
+    .btn-glass {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid var(--glass-border);
+        color: var(--text-main);
+        transition: var(--transition);
+    }
+
+    .btn-glass:hover {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: var(--text-main);
+    }
+
+    .pulse-dot-sm {
+        display: inline-block;
+        width: 6px;
+        height: 6px;
+        background: #10b981;
+        border-radius: 50%;
+        margin-right: 5px;
+        box-shadow: 0 0 0 rgba(16, 185, 129, 0.4);
+        animation: pulse_sm 2s infinite;
+    }
+
+    @keyframes pulse_sm {
+        0% {
+            box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4);
+        }
+
+        70% {
+            box-shadow: 0 0 0 6px rgba(16, 185, 129, 0);
+        }
+
+        100% {
+            box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+        }
+    }
+
+    .uppercase {
+        text-transform: uppercase;
+    }
+
+    .tracking-widest {
+        letter-spacing: 3px;
+    }
+
+    .font-weight-800 {
+        font-weight: 800;
+    }
+</style>
+{% endblock %}

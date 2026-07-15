@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Operations Command{% endblock %} - INSTAShare Network</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg-deep: #050507;
+            --bg-card: rgba(13, 13, 18, 0.7);
+            --primary-color: #8b5cf6;
+            --secondary-color: #ec4899;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --gradient-primary: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
+            --shadow-glow: 0 0 20px rgba(139, 92, 246, 0.15);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body {
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        .navbar-modern {
+            background: rgba(5, 5, 7, 0.8) !important;
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 15px 0;
+        }
+
+        .navbar-brand {
+            font-weight: 800;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            font-size: 1.2rem;
+        }
+
+        .sidebar-admin {
+            background: var(--bg-card);
+            border-right: 1px solid var(--glass-border);
+            height: calc(100vh - 70px);
+            position: sticky;
+            top: 70px;
+            padding: 30px 15px;
+        }
+
+        .nav-link-admin {
+            color: var(--text-muted);
+            padding: 12px 20px;
+            border-radius: 12px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: var(--transition);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .nav-link-admin:hover,
+        .nav-link-admin.active {
+            background: rgba(139, 92, 246, 0.1);
+            color: var(--primary-color);
+            box-shadow: inset 0 0 10px rgba(139, 92, 246, 0.05);
+        }
+
+        .main-admin-viewport {
+            padding: 40px;
+        }
+
+        .admin-card {
+            background: var(--bg-card);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 25px;
+            backdrop-filter: blur(15px);
+            transition: var(--transition);
+        }
+
+        .admin-card:hover {
+            border-color: var(--primary-color);
+            box-shadow: var(--shadow-glow);
+        }
+
+        .text-gradient {
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .btn-glass {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            color: var(--text-main);
+            border-radius: 10px;
+            transition: var(--transition);
+        }
+
+        .btn-glass:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--text-main);
+        }
+
+        .uppercase {
+            text-transform: uppercase;
+        }
+
+        .tracking-wider {
+            letter-spacing: 1px;
+        }
+
+        @media (max-width: 992px) {
+            .sidebar-admin {
+                height: auto;
+                position: static;
+                border-right: none;
+                border-bottom: 1px solid var(--glass-border);
+            }
+        }
+    </style>
+    {% block extra_head %}{% endblock %}
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark navbar-modern sticky-top">
+        <div class="container-fluid px-lg-4">
+            <a class="navbar-brand" href="{{ url_for('admin_dashboard') }}">
+                <i class="fas fa-shield-halved me-2 text-primary"></i>Command <span class="text-gradient">Center</span>
+            </a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-center">
+                    <li class="nav-item me-3">
+                        <span class="badge bg-danger rounded-pill px-3 py-2 small uppercase tracking-wider">
+                            <i class="fas fa-bolt me-1"></i>Secure Mode Active
+                        </span>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle btn-glass px-3 py-2 d-flex align-items-center gap-2" href="#"
+                            role="button" data-bs-toggle="dropdown">
+                            <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center"
+                                style="width: 24px; height: 24px; font-size: 0.7rem; font-weight: 800;">
+                                {{ current_user.username[0].upper() }}
+                            </div>
+                            {{ current_user.username }}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end bg-dark border-glass mt-2">
+                            <li><a class="dropdown-item text-white" href="{{ url_for('feed') }}"><i
+                                        class="fas fa-desktop me-2 text-muted"></i>Main Interface</a></li>
+                            <li>
+                                <hr class="dropdown-divider border-glass">
+                            </li>
+                            <li><a class="dropdown-item text-danger" href="{{ url_for('logout') }}"><i
+                                        class="fas fa-power-off me-2"></i>Terminate Session</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar Navigation -->
+            <div class="col-lg-2 px-0 bg-dark bg-opacity-25 border-end border-glass d-none d-lg-block">
+                <div class="sidebar-admin">
+                    <h6 class="text-muted small uppercase tracking-widest mb-4 px-3">Intelligence Core</h6>
+                    <nav class="nav flex-column px-2">
+                        <a href="{{ url_for('admin_dashboard') }}"
+                            class="nav-link-admin {% if request.endpoint == 'admin_dashboard' %}active{% endif %}">
+                            <i class="fas fa-gauge-high"></i> Monitoring
+                        </a>
+                        <a href="{{ url_for('admin_users') }}"
+                            class="nav-link-admin {% if request.endpoint == 'admin_users' %}active{% endif %}">
+                            <i class="fas fa-user-shield"></i> Identity Units
+                        </a>
+                        <a href="{{ url_for('admin_posts') }}"
+                            class="nav-link-admin {% if request.endpoint == 'admin_posts' %}active{% endif %}">
+                            <i class="fas fa-signal"></i> Signal Streams
+                        </a>
+                        <a href="{{ url_for('admin_chat_monitor') }}"
+                            class="nav-link-admin {% if request.endpoint == 'admin_chat_monitor' %}active{% endif %}">
+                            <i class="fas fa-eye"></i> Transmission Scan
+                        </a>
+                        <a href="{{ url_for('admin_analytics') }}"
+                            class="nav-link-admin {% if request.endpoint == 'admin_analytics' %}active{% endif %}">
+                            <i class="fas fa-microchip"></i> Neural Analytics
+                        </a>
+                        <a href="{{ url_for('admin_system') }}"
+                            class="nav-link-admin {% if request.endpoint == 'admin_system' %}active{% endif %}">
+                            <i class="fas fa-dna"></i> System DNA
+                        </a>
+                    </nav>
+                </div>
+            </div>
+
+            <!-- Main Content Area -->
+            <main class="col-lg-10 px-0">
+                <div class="main-admin-viewport">
+                    <!-- Notifications -->
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                    <div class="mb-4">
+                        {% for category, message in messages %}
+                        <div class="alert bg-{{ 'danger' if category == 'error' else 'primary' }} bg-opacity-10 border-{{ 'danger' if category == 'error' else 'primary' }} border-opacity-25 text-{{ 'danger' if category == 'error' else 'white' }} alert-dismissible fade show rounded-4"
+                            role="alert">
+                            <i class="fas fa-info-circle me-2"></i>{{ message }}
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert"></button>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                    {% endwith %}
+
+                    <!-- Section Header -->
+                    <div class="d-flex justify-content-between align-items-center mb-5" data-aos="fade-right">
+                        <div>
+                            <h1 class="h2 fw-bold text-white mb-1">{% block page_title %}Operational Intelligence{%
+                                endblock %}</h1>
+                            <p class="text-muted small mb-0">{% block page_subtitle %}Real-time administrative control
+                                and monitoring.{% endblock %}</p>
+                        </div>
+                        <div class="toolbar-actions">
+                            {% block toolbar %}{% endblock %}
+                        </div>
+                    </div>
+
+                    <!-- Dynamic Content -->
+                    <div data-aos="fade-up">
+                        {% block content %}{% endblock %}
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        AOS.init({ duration: 800, once: true });
+    </script>
+    {% block scripts %}{% endblock %}
+</body>
+
+</html>

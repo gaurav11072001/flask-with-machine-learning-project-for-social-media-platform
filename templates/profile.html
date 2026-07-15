@@ -1,0 +1,281 @@
+{% extends "base.html" %}
+
+{% block title %}{{ user.username }} - INSTAShare{% endblock %}
+
+{% block content %}
+<div class="profile-container px-3">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-10 col-xl-8">
+                <!-- Profile Header -->
+                <div class="profile-header-modern" data-aos="fade-down">
+                    <div class="profile-avatar-section">
+                        <div class="profile-avatar-glow">
+                            <img src="{{ url_for('uploaded_file', filename='profiles/' + user.profile_pic) }}"
+                                alt="{{ user.username }}" class="profile-avatar-img"
+                                onerror="this.src='/static/img/default-avatar.png'">
+                        </div>
+                    </div>
+
+                    <div class="profile-info-modern">
+                        <div class="profile-top-bar d-flex align-items-center mb-4">
+                            <h2 class="profile-username text-white me-4 mb-0">{{ user.username }}</h2>
+                            <div class="profile-actions-modern d-flex gap-2">
+                                {% if user == current_user %}
+                                <a href="{{ url_for('edit_profile') }}"
+                                    class="btn btn-glass-primary btn-sm rounded-pill px-4">
+                                    <i class="fas fa-sliders me-2"></i>Configure
+                                </a>
+                                <button class="btn btn-glass btn-sm rounded-circle" data-bs-toggle="modal"
+                                    data-bs-target="#settingsModal">
+                                    <i class="fas fa-shield-halved"></i>
+                                </button>
+                                {% else %}
+                                {% if is_following %}
+                                <button class="btn btn-glass-secondary btn-sm rounded-pill px-4"
+                                    onclick="unfollowUser('{{ user.username }}', this)">
+                                    <i class="fas fa-user-check me-2"></i>Secure Link
+                                </button>
+                                {% else %}
+                                <button class="btn btn-primary btn-sm rounded-pill px-4"
+                                    onclick="followUser('{{ user.username }}', this)">
+                                    <i class="fas fa-plus me-2"></i>Connect
+                                </button>
+                                {% endif %}
+                                {% if is_following or user.is_following(current_user) %}
+                                <a href="{{ url_for('chat', username=user.username) }}"
+                                    class="btn btn-glass btn-sm rounded-circle">
+                                    <i class="fas fa-comment-dots"></i>
+                                </a>
+                                {% endif %}
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="profile-stats-modern d-flex gap-5 mb-4">
+                            <div class="stat-item text-center">
+                                <span class="stat-num text-white">{{ user.posts_count() }}</span>
+                                <span class="stat-label text-secondary small uppercase">Signals</span>
+                            </div>
+                            <div class="stat-item text-center pointer" data-bs-toggle="modal"
+                                data-bs-target="#followersModal">
+                                <span class="stat-num text-white">{{ user.followers_count() }}</span>
+                                <span class="stat-label text-secondary small uppercase">Trusts</span>
+                            </div>
+                            <div class="stat-item text-center pointer" data-bs-toggle="modal"
+                                data-bs-target="#followingModal">
+                                <span class="stat-num text-white">{{ user.following_count() }}</span>
+                                <span class="stat-label text-secondary small uppercase">Trusted</span>
+                            </div>
+                        </div>
+
+                        {% if user.bio %}
+                        <div class="profile-bio-modern text-secondary">
+                            <p class="mb-0">{{ user.bio | replace('\\n', '<br>') | safe }}</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Integrated Tabs System -->
+                <div class="tabs-container-modern mt-5" data-aos="fade-up">
+                    <ul class="nav nav-tabs border-0 justify-content-center gap-4 mb-5" id="profileTabs">
+                        <li class="nav-item">
+                            <a class="nav-link active border-0 text-secondary uppercase tracking-wider small fw-bold"
+                                data-bs-toggle="tab" href="#postsTab">
+                                <i class="fas fa-grid-2 me-2"></i>Signals
+                            </a>
+                        </li>
+                        {% if user == current_user %}
+                        <li class="nav-item">
+                            <a class="nav-link border-0 text-secondary uppercase tracking-wider small fw-bold"
+                                data-bs-toggle="tab" href="#savedTab">
+                                <i class="fas fa-bookmark me-2"></i>Vault
+                            </a>
+                        </li>
+                        {% endif %}
+                        <li class="nav-item">
+                            <a class="nav-link border-0 text-secondary uppercase tracking-wider small fw-bold"
+                                data-bs-toggle="tab" href="#taggedTab">
+                                <i class="fas fa-tag me-2"></i>Analyzed
+                            </a>
+                        </li>
+                    </ul>
+
+                    <div class="tab-content" id="profileTabsContent">
+                        <!-- Signals Tab -->
+                        <div class="tab-pane fade show active" id="postsTab">
+                            {% if posts %}
+                            <div class="profile-posts-grid">
+                                {% for post in posts %}
+                                <div class="post-grid-item" onclick="openPostModal('{{ post.id }}')" data-aos="zoom-in"
+                                    data-aos-delay="{{ loop.index * 50 }}">
+                                    {% if post.image_filename.lower().endswith(('.mp4', '.mov', '.avi')) %}
+                                    <div class="post-video-indicator">
+                                        <i class="fas fa-play"></i>
+                                    </div>
+                                    <video class="grid-media">
+                                        <source
+                                            src="{{ url_for('uploaded_file', filename='posts/' + post.image_filename) }}"
+                                            type="video/mp4">
+                                    </video>
+                                    {% else %}
+                                    <img src="{{ url_for('uploaded_file', filename='posts/' + post.image_filename) }}"
+                                        alt="Post" class="grid-media">
+                                    {% endif %}
+
+                                    <div class="post-overlay">
+                                        <div class="overlay-stats">
+                                            <span class="overlay-stat"><i class="fas fa-heart me-1"></i>{{
+                                                post.likes_count() }}</span>
+                                            <span class="overlay-stat"><i class="fas fa-comment me-1"></i>{{
+                                                post.comments_count() }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            <div class="empty-state-modern py-5" data-aos="fade-up">
+                                <div class="empty-icon-glow mb-4">
+                                    <i class="fas fa-satellite-dish"></i>
+                                </div>
+                                <h3 class="text-white fw-black mb-2">No Signals Detected</h3>
+                                <p class="text-secondary mx-auto" style="max-width: 400px;">
+                                    {% if user == current_user %}
+                                    Ready to broadcast your first data stream? Your secure signals will be archived
+                                    here.
+                                <div class="mt-4">
+                                    <a href="{{ url_for('upload_post') }}"
+                                        class="btn btn-primary rounded-pill px-5 shadow-glow fw-bold">
+                                        <i class="fas fa-plus me-2"></i>Initialize Broadcast
+                                    </a>
+                                </div>
+                                {% else %}
+                                This identity hasn't synchronized any public signals with the network yet.
+                                {% endif %}
+                                </p>
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Saved/Vault Tab -->
+                        {% if user == current_user %}
+                        <div class="tab-pane fade" id="savedTab">
+                            <div class="empty-state-modern py-5">
+                                <div class="empty-icon-glow mb-4" style="--glow-color: var(--accent-secondary);">
+                                    <i class="fas fa-folder-lock"></i>
+                                </div>
+                                <h3 class="text-white fw-black mb-2">Secure Vault</h3>
+                                <p class="text-secondary mx-auto" style="max-width: 400px;">
+                                    Your personal archive of bookmarked signals. These identities are only visible to
+                                    you.
+                                </p>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <!-- Analyzed/Tagged Tab -->
+                        <div class="tab-pane fade" id="taggedTab">
+                            <div class="empty-state-modern py-5">
+                                <div class="empty-icon-glow mb-4" style="--glow-color: var(--accent-color);">
+                                    <i class="fas fa-fingerprint"></i>
+                                </div>
+                                <h3 class="text-white fw-black mb-2">Neural Linkage</h3>
+                                <p class="text-secondary mx-auto" style="max-width: 400px;">
+                                    Signals where your identity has been cross-referenced by other units will appear
+                                    here.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Followers Modal -->
+    <div class="modal fade" id="followersModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Followers</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="followers-list">
+                        <div class="text-center text-secondary py-5">
+                            <i class="fas fa-users-slash fs-1 mb-3 opacity-25"></i>
+                            <p class="mb-0 small uppercase tracking-wider">Access Restricted</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Following Modal -->
+    <div class="modal fade" id="followingModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Following</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="following-list">
+                        <div class="text-center text-secondary py-5">
+                            <i class="fas fa-user-secret fs-1 mb-3 opacity-25"></i>
+                            <p class="mb-0 small uppercase tracking-wider">Access Restricted</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% endblock %}
+
+    {% block extra_js %}
+    <script>
+        function openPostModal(postId) {
+            window.location.href = '/feed#post-' + postId;
+        }
+
+        function deletePostFromProfile(postId) {
+            if (confirm('Are you certain you wish to terminate this signal broadcast? This action is irreversible.')) {
+                const postItem = document.querySelector(`[onclick*="${postId}"]`);
+                if (postItem) postItem.style.opacity = '0.4';
+
+                fetch(`/delete_post/${postId}`, { method: 'POST' })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success) {
+                            if (postItem) {
+                                postItem.style.transition = 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)';
+                                postItem.style.transform = 'scale(0.8) translateY(20px)';
+                                postItem.style.opacity = '0';
+                                setTimeout(() => { location.reload(); }, 400);
+                            } else {
+                                location.reload();
+                            }
+                        } else {
+                            alert(data.error || 'Signal termination failed.');
+                            if (postItem) postItem.style.opacity = '1';
+                        }
+                    });
+            }
+        }
+
+        function followUser(username, btn) {
+            fetch(`/follow/${username}`, { method: 'POST' })
+                .then(res => res.json())
+                .then(data => { if (data.success) location.reload(); });
+        }
+
+        function unfollowUser(username, btn) {
+            fetch(`/unfollow/${username}`, { method: 'POST' })
+                .then(res => res.json())
+                .then(data => { if (data.success) location.reload(); });
+        }
+    </script>
+    {% endblock %}

@@ -1,0 +1,757 @@
+{% extends "base.html" %}
+
+{% block title %}Secure Transmission - {{ user.username }}{% endblock %}
+
+{% block extra_head %}
+<style>
+    body {
+        overflow: hidden;
+        background: var(--bg-deep);
+    }
+
+    .main-content {
+        padding-top: 76px;
+        height: 100vh;
+    }
+
+    .chat-container-modern {
+        background: var(--bg-deep);
+        height: calc(100vh - 76px);
+        overflow: hidden;
+    }
+
+    .border-glass {
+        border-color: var(--glass-border) !important;
+    }
+
+    .chat-sidebar-modern {
+        padding: 20px;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        background: rgba(10, 10, 12, 0.4);
+    }
+
+    .avatar-glow-sm {
+        width: 100px;
+        height: 100px;
+        padding: 4px;
+        background: var(--gradient-primary);
+        border-radius: 50%;
+        box-shadow: 0 0 20px rgba(139, 92, 246, 0.2);
+    }
+
+    .avatar-inner {
+        width: 100%;
+        height: 100%;
+        background: var(--bg-card);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 800;
+        font-size: 2rem;
+        color: var(--text-main);
+        border: 2px solid var(--bg-deep);
+    }
+
+    .status-badge {
+        font-size: 0.75rem;
+        color: #10b981;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+    }
+
+    .pulse-dot {
+        width: 8px;
+        height: 8px;
+        background: #10b981;
+        border-radius: 50%;
+        box-shadow: 0 0 0 rgba(16, 185, 129, 0.4);
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+        0% {
+            box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4);
+        }
+
+        70% {
+            box-shadow: 0 0 0 10px rgba(16, 185, 129, 0);
+        }
+
+        100% {
+            box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+        }
+    }
+
+    .security-card-mini {
+        padding: 15px;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid var(--glass-border);
+        border-radius: 12px;
+    }
+
+    .security-card-mini .title {
+        display: block;
+        font-size: 0.65rem;
+        color: var(--text-muted);
+        margin-bottom: 2px;
+    }
+
+    .security-card-mini .value {
+        font-weight: 600;
+    }
+
+    .avatar-mini {
+        width: 40px;
+        height: 40px;
+        background: var(--gradient-primary);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        color: white;
+    }
+
+    .chat-messages-container-modern {
+        overflow-y: auto;
+        background: radial-gradient(circle at top right, rgba(139, 92, 246, 0.05), transparent);
+    }
+
+    .message-row-modern {
+        display: flex;
+        margin-bottom: 20px;
+        width: 100%;
+    }
+
+    .message-row-modern.sent {
+        justify-content: flex-end;
+    }
+
+    .message-row-modern.received {
+        justify-content: flex-start;
+    }
+
+    .message-bubble-modern {
+        max-width: 70%;
+        padding: 12px 18px;
+        border-radius: 20px;
+        position: relative;
+        font-size: 0.95rem;
+    }
+
+    .sent .message-bubble-modern {
+        background: var(--primary-color);
+        color: white;
+        border-bottom-right-radius: 4px;
+        box-shadow: 0 4px 15px rgba(139, 92, 246, 0.2);
+    }
+
+    .received .message-bubble-modern {
+        background: var(--bg-card);
+        color: var(--text-main);
+        border: 1px solid var(--glass-border);
+        border-bottom-left-radius: 4px;
+    }
+
+    .flagged-bubble {
+        border: 2px solid var(--danger-color) !important;
+        background: rgba(239, 68, 68, 0.1) !important;
+        box-shadow: 0 0 20px rgba(239, 68, 68, 0.2) !important;
+    }
+
+    /* Phishing URL styles */
+    .phishing-url-wrap {
+        margin-top: 8px;
+        padding: 8px 10px;
+        background: rgba(239, 68, 68, 0.12);
+        border: 1px solid rgba(239, 68, 68, 0.4);
+        border-radius: 10px;
+    }
+
+    .phishing-url-wrap a {
+        color: #f87171;
+        word-break: break-all;
+        text-decoration: underline;
+        font-size: 0.85rem;
+    }
+
+    .phishing-url-wrap a:hover {
+        color: #ef4444;
+    }
+
+    .safe-url-wrap {
+        margin-top: 6px;
+        padding: 6px 10px;
+        background: rgba(16, 185, 129, 0.08);
+        border: 1px solid rgba(16, 185, 129, 0.3);
+        border-radius: 10px;
+    }
+
+    .safe-url-wrap a {
+        color: #34d399;
+        word-break: break-all;
+        text-decoration: underline;
+        font-size: 0.85rem;
+    }
+
+    .safe-url-wrap a:hover {
+        color: #10b981;
+    }
+
+    .phishing-toast {
+        position: fixed;
+        top: 80px;
+        right: 20px;
+        z-index: 9999;
+        min-width: 320px;
+        max-width: 430px;
+        animation: slideInRight 0.3s ease;
+    }
+
+    @keyframes slideInRight {
+        from {
+            transform: translateX(110%);
+            opacity: 0;
+        }
+
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+
+    .bubble-time {
+        font-size: 0.7rem;
+        opacity: 0.6;
+        display: block;
+        text-align: right;
+    }
+
+    .chat-input-field {
+        background: var(--bg-deep) !important;
+        border: 1px solid var(--glass-border) !important;
+        color: var(--text-main) !important;
+        border-radius: 50px !important;
+        padding: 12px 50px 12px 20px !important;
+    }
+
+    .chat-input-field:focus {
+        border-color: var(--primary-color) !important;
+        box-shadow: 0 0 15px rgba(139, 92, 246, 0.1) !important;
+    }
+
+    .typing-indicator-modern {
+        display: flex;
+        align-items: center;
+    }
+
+    .typing-dots-modern span {
+        width: 6px;
+        height: 6px;
+        background: var(--primary-color);
+        display: inline-block;
+        border-radius: 50%;
+        margin: 0 2px;
+        animation: typing 1.4s infinite initial;
+    }
+
+    .typing-dots-modern span:nth-child(2) {
+        animation-delay: 0.2s;
+    }
+
+    .typing-dots-modern span:nth-child(3) {
+        animation-delay: 0.4s;
+    }
+
+    @keyframes typing {
+
+        0%,
+        80%,
+        100% {
+            transform: scale(0.6);
+            opacity: 0.4;
+        }
+
+        40% {
+            transform: scale(1);
+            opacity: 1;
+        }
+    }
+
+    .uppercase {
+        text-transform: uppercase;
+    }
+
+    .tracking-wider {
+        letter-spacing: 1px;
+    }
+
+    .tracking-widest {
+        letter-spacing: 2px;
+    }
+
+    .italic {
+        font-style: italic;
+    }
+
+    /* Custom Scrollbar */
+    .chat-messages-container-modern::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .chat-messages-container-modern::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .chat-messages-container-modern::-webkit-scrollbar-thumb {
+        background: var(--glass-border);
+        border-radius: 10px;
+    }
+
+    @media (max-width: 991px) {
+        .main-content {
+            padding-top: 60px;
+        }
+
+        .chat-container-modern {
+            height: calc(100vh - 60px);
+            height: calc(100svh - 60px);
+        }
+    }
+
+    @media (max-width: 768px) {
+        .chat-sidebar-modern {
+            display: none;
+        }
+
+        .chat-header-modern {
+            padding: 12px 15px !important;
+        }
+
+        .chat-messages-container-modern {
+            padding: 15px !important;
+        }
+
+        .message-bubble-modern {
+            max-width: 92%;
+            padding: 10px 14px;
+            font-size: 0.9rem;
+        }
+
+        .message-row-modern {
+            margin-bottom: 12px;
+        }
+
+        .chat-input-modern {
+            padding: 10px 12px !important;
+        }
+
+        .chat-input-modern form {
+            gap: 10px !important;
+        }
+
+        .chat-input-field {
+            padding: 10px 40px 10px 15px !important;
+            font-size: 0.9rem;
+        }
+
+        .avatar-mini {
+            width: 32px;
+            height: 32px;
+            font-size: 0.75rem;
+        }
+
+        #sendBtn {
+            width: 44px !important;
+            height: 44px !important;
+            padding: 0 !important;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .chat-session-actions {
+            display: none;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="chat-container-modern">
+    <div class="container-fluid h-100 p-0">
+        <div class="row h-100 g-0">
+            <!-- Chat Sidebar -->
+            <div class="col-md-3 col-lg-2 d-none d-md-block border-end border-glass">
+                <div class="chat-sidebar-modern">
+                    <div class="chat-sidebar-header-modern mb-4">
+                        <a href="{{ url_for('feed') }}" class="btn btn-glass btn-sm w-100 rounded-pill">
+                            <i class="fas fa-arrow-left me-2"></i>Network Feed
+                        </a>
+                    </div>
+
+                    <div class="chat-active-identity text-center mb-5">
+                        <div class="avatar-glow-sm mb-3 mx-auto">
+                            <div class="avatar-inner">
+                                {{ user.username[0].upper() }}
+                            </div>
+                        </div>
+                        <h6 class="text-white mb-1">{{ user.username }}</h6>
+                        <div class="status-badge online">
+                            <span class="pulse-dot"></span> Secure Connection
+                        </div>
+                    </div>
+
+                    <div class="chat-security-vitals mt-auto px-3 py-4">
+                        <div class="security-card-mini">
+                            <i class="fas fa-shield-halved text-primary mb-2 d-block"></i>
+                            <span class="title small uppercase tracking-wider">Protocol</span>
+                            <span class="value small text-muted">E2E Autonomous</span>
+                        </div>
+                        <div class="security-card-mini mt-3 bg-danger bg-opacity-10 border-danger border-opacity-20">
+                            <i class="fas fa-microchip text-danger mb-2 d-block"></i>
+                            <span class="title small uppercase tracking-wider text-danger">Monitoring</span>
+                            <span class="value small text-danger text-opacity-75">AI Scan Active</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chat Main -->
+            <div class="col-md-9 col-lg-10 h-100">
+                <div class="chat-main-modern h-100 d-flex flex-column">
+                    <!-- Chat Header -->
+                    <div
+                        class="chat-header-modern px-4 py-3 d-flex align-items-center justify-content-between border-bottom border-glass">
+                        <div class="d-flex align-items-center">
+                            <button class="btn btn-glass btn-sm d-md-none me-3 rounded-circle" onclick="history.back()">
+                                <i class="fas fa-arrow-left"></i>
+                            </button>
+                            <div class="chat-identity-header d-flex align-items-center">
+                                <div class="avatar-mini me-3">
+                                    {{ user.username[0].upper() }}
+                                </div>
+                                <div>
+                                    <h6 class="text-white mb-0">{{ user.username }}</h6>
+                                    <small class="text-primary small italic">Verified Terminal</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="chat-session-actions">
+                            <button class="btn btn-glass btn-sm rounded-circle me-2" title="Voice Session">
+                                <i class="fas fa-phone-slash"></i>
+                            </button>
+                            <button class="btn btn-glass btn-sm rounded-circle me-2" title="Visual Session">
+                                <i class="fas fa-video-slash"></i>
+                            </button>
+                            <button class="btn btn-glass btn-sm rounded-circle" title="System Settings">
+                                <i class="fas fa-sliders"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Chat Messages -->
+                    <div class="chat-messages-container-modern flex-grow-1 px-4 py-4" id="chatMessages">
+                        <div class="text-center mb-5 mt-3">
+                            <span
+                                class="badge bg-dark bg-opacity-50 text-muted uppercase tracking-widest small px-3 py-2 border border-glass">
+                                <i class="fas fa-lock me-2"></i>Secure Link Established
+                            </span>
+                        </div>
+
+                        {% for message in messages %}
+                        <div
+                            class="message-row-modern {{ 'sent' if message.author.username == current_user.username else 'received' }}">
+                            <div class="message-bubble-modern {% if message.is_flagged %}flagged-bubble{% endif %}">
+                                <div class="bubble-text" data-raw="{{ message.content | e }}">{{ message.content | e }}
+                                </div>
+                                {% if message.is_flagged %}
+                                <div
+                                    class="flagged-meta mt-2 py-1 px-2 rounded-2 bg-danger bg-opacity-20 border border-danger border-opacity-25">
+                                    <i class="fas fa-triangle-exclamation text-danger me-2"></i>
+                                    <small class="text-danger small">Anomalous content signature detected</small>
+                                </div>
+                                {% endif %}
+                                <div class="bubble-time mt-1">{{ message.timestamp.strftime('%H:%M') }}</div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Typing Indicator -->
+                    <div id="typingIndicator" class="typing-indicator-modern px-4 py-2" style="display: none;">
+                        <div class="typing-dots-modern me-2">
+                            <span></span><span></span><span></span>
+                        </div>
+                        <span class="text-muted small italic">{{ user.username }} transmitting...</span>
+                    </div>
+
+                    <!-- Chat Input -->
+                    <div class="chat-input-modern p-4 border-top border-glass">
+                        <form id="messageForm" class="d-flex align-items-center gap-3">
+                            <button class="btn btn-glass btn-sm rounded-circle p-2" type="button"
+                                title="Upload Payload">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                            <div class="flex-grow-1 position-relative">
+                                <input type="text" class="form-control chat-input-field" id="messageInput"
+                                    placeholder="Enter secure transmission..." autocomplete="off">
+                                <button
+                                    class="btn btn-link text-muted position-absolute end-0 top-50 translate-middle-y me-2"
+                                    type="button">
+                                    <i class="fas fa-face-smile"></i>
+                                </button>
+                            </div>
+                            <button type="submit"
+                                class="btn btn-primary rounded-circle p-3 d-flex align-items-center justify-content-center"
+                                id="sendBtn" style="width: 50px; height: 50px;">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const socket = io();
+    const room = '{{ room }}';
+    const currentUser = '{{ current_user.username }}';
+    const chatUser = '{{ user.username }}';
+
+    // Join room
+    socket.emit('join', {
+        username: currentUser,
+        room: room
+    });
+
+    // ── Process historical messages on page load ──────────────────
+    // Makes URLs in already-rendered (Jinja) bubbles clickable.
+    function processExistingMessages() {
+        const urlRegex = /((?:https?:\/\/|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}\/)(?:[^\s()<>]+|\((?:[^\s()<>]+|(?:\([^\s()<>]+\)))*\))+(?:\((?:[^\s()<>]+|(?:\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'".,<>?«»""'']))/gi;
+        document.querySelectorAll('.bubble-text[data-raw]').forEach(function (el) {
+            const raw = el.getAttribute('data-raw');
+            if (!raw || !urlRegex.test(raw)) return;
+            urlRegex.lastIndex = 0; // reset after test
+            const linked = raw.replace(urlRegex, function (url) {
+                const href = url.startsWith('http') ? url : 'https://' + url;
+                return '<a href="' + href + '" target="_blank" rel="noopener noreferrer" '
+                    + 'style="color:#a78bfa;word-break:break-all;">' + url + '</a>'
+                    + ' <span class="badge bg-secondary ms-1" style="font-size:0.6rem;"'
+                    + ' title="Scanning happens on new messages only">🔗 Link</span>';
+            });
+            el.innerHTML = linked;
+        });
+    }
+    document.addEventListener('DOMContentLoaded', processExistingMessages);
+    // call immediately too, in case DOM is already ready (extra_js loads late)
+    if (document.readyState === 'complete' || document.readyState === 'interactive') {
+        processExistingMessages();
+    }
+    // ─────────────────────────────────────────────────────────────
+
+    // Handle form submission
+    document.getElementById('messageForm').addEventListener('submit', function (e) {
+        e.preventDefault();
+        const messageInput = document.getElementById('messageInput');
+        const message = messageInput.value.trim();
+
+        if (message) {
+            socket.emit('message', {
+                message: message,
+                room: room
+            });
+            messageInput.value = '';
+        }
+    });
+
+    // Handle incoming messages
+    socket.on('message', function (data) {
+        addMessage(data);
+        scrollToBottom();
+    });
+
+    // Handle crime alerts
+    socket.on('crime_alert', function (data) {
+        showCrimeAlert(data);
+    });
+
+    // Handle status messages
+    socket.on('status', function (data) {
+        addStatusMessage(data.msg);
+    });
+
+
+    // ── URL renderer: makes URLs clickable + annotates phishing ones ──
+    function renderMessageContent(rawText, phishingResults) {
+        const urlRegex = /((?:https?:\/\/|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}\/)(?:[^\s()<>]+|\((?:[^\s()<>]+|(?:\([^\s()<>]+\)))*\))+(?:\((?:[^\s()<>]+|(?:\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'".,<>?«»""'']))/gi;
+
+        // Build lookup map url → result
+        const phishingMap = {};
+        if (phishingResults && phishingResults.length) {
+            phishingResults.forEach(r => { phishingMap[r.url] = r; });
+        }
+
+        // Escape HTML first
+        const escaped = rawText
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;');
+
+        // Replace URLs with annotated links
+        return escaped.replace(urlRegex, function (url) {
+            const r = phishingMap[url];
+            const href = url.startsWith('http') ? url : 'https://' + url;
+            if (r && r.is_phishing) {
+                return `<span class="phishing-url-wrap d-block">`
+                    + `<i class="fas fa-skull-crossbones text-danger me-1"></i>`
+                    + `<a href="javascript:void(0)" style="cursor: not-allowed; opacity: 0.7; pointer-events: none; text-decoration: line-through !important;" title="Malicious link blocked by security system">${url}</a>`
+                    + ` <span class="badge bg-danger ms-1" style="font-size:0.65rem;">⚠️ Phishing ${r.confidence}%</span>`
+                    + `<div class="text-danger small mt-1" style="font-size: 0.7rem; font-weight: 500;"><i class="fas fa-hand-paper me-1"></i>Link blocked for your protection</div>`
+                    + `</span>`;
+            } else if (r) {
+                return `<span class="safe-url-wrap d-block">`
+                    + `<i class="fas fa-shield-halved text-success me-1"></i>`
+                    + `<a href="${href}" target="_blank" rel="noopener noreferrer">${url}</a>`
+                    + ` <span class="badge bg-success ms-1" style="font-size:0.65rem;">✔ Safe</span>`
+                    + `</span>`;
+            } else {
+                return `<a href="${href}" target="_blank" rel="noopener noreferrer">${url}</a>`;
+            }
+        });
+    }
+
+    function addMessage(data) {
+        const messagesContainer = document.getElementById('chatMessages');
+        const messageClass = data.username === currentUser ? 'sent' : 'received';
+        const flaggedClass = data.is_flagged ? ' flagged-bubble' : '';
+        const content = renderMessageContent(data.message, data.phishing_results || []);
+
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message-row-modern ${messageClass}`;
+        messageDiv.innerHTML = `
+            <div class="message-bubble-modern${flaggedClass}">
+                <div class="bubble-text">${content}</div>
+                ${(data.is_flagged && data.flag_type !== 'phishing') ? `
+                    <div class="flagged-meta mt-2 py-1 px-2 rounded-2 bg-danger bg-opacity-20 border border-danger border-opacity-25">
+                        <i class="fas fa-triangle-exclamation text-danger me-2"></i>
+                        <small class="text-danger small">Anomalous content signature detected</small>
+                    </div>` : ''}
+                ${data.has_phishing_url ? `
+                    <div class="flagged-meta mt-2 py-1 px-2 rounded-2 bg-danger bg-opacity-20 border border-danger border-opacity-25">
+                        <i class="fas fa-skull-crossbones text-danger me-2"></i>
+                        <small class="text-danger small">⚠️ Phishing URL detected by AI model</small>
+                    </div>` : ''}
+                <div class="bubble-time mt-1">${data.timestamp}</div>
+            </div>`;
+        messagesContainer.appendChild(messageDiv);
+    }
+
+    function addStatusMessage(message) {
+        const messagesContainer = document.getElementById('chatMessages');
+        const statusDiv = document.createElement('div');
+        statusDiv.className = 'status-message text-center my-3';
+        statusDiv.innerHTML = `<small class="text-muted uppercase tracking-wider" style="font-size: 0.65rem;">${message}</small>`;
+        messagesContainer.appendChild(statusDiv);
+    }
+
+    function showCrimeAlert(data) {
+        try {
+            const modal = new bootstrap.Modal(document.getElementById('crimeAlertModal'));
+            document.getElementById('flaggedKeywords').textContent = data.keywords.join(', ');
+            modal.show();
+        } catch (e) { console.warn('crimeAlertModal not found', e); }
+    }
+
+    // ── Phishing toast (slide-in from right) ──────────────────────
+    function showPhishingToast(phishingUrls, senderLabel) {
+        const existing = document.getElementById('phishingToast');
+        if (existing) existing.remove();
+
+        const urlList = phishingUrls.map(r => {
+            const href = r.url.startsWith('http') ? r.url : 'https://' + r.url;
+            const short = r.url.length > 50 ? r.url.substring(0, 47) + '…' : r.url;
+            return `<li class="mb-1">
+                <a href="${href}" target="_blank" rel="noopener noreferrer"
+                   class="text-warning text-decoration-underline">${short}</a>
+                <span class="badge bg-danger ms-1">${r.confidence}% risk</span>
+            </li>`;
+        }).join('');
+
+        const toast = document.createElement('div');
+        toast.id = 'phishingToast';
+        toast.className = 'phishing-toast';
+        toast.innerHTML = `
+            <div class="alert alert-danger shadow-lg border border-danger border-opacity-50 rounded-3 mb-0 p-3">
+                <div class="d-flex align-items-center mb-2">
+                    <i class="fas fa-skull-crossbones text-danger me-2 fs-5"></i>
+                    <strong class="text-danger">Phishing URL Detected!</strong>
+                    <button type="button" class="btn-close btn-close-white ms-auto"
+                            onclick="document.getElementById('phishingToast').remove()"></button>
+                </div>
+                <p class="mb-1 small text-danger-emphasis">
+                    <strong>${senderLabel}</strong> shared a link flagged as phishing:
+                </p>
+                <ul class="mb-0 ps-3 small">${urlList}</ul>
+                <p class="mt-2 mb-0 text-muted" style="font-size:0.7rem;">
+                    ⚠️ Do not click suspicious links. Stay safe online.
+                </p>
+            </div>`;
+        document.body.appendChild(toast);
+        setTimeout(() => { if (document.getElementById('phishingToast')) toast.remove(); }, 12000);
+    }
+
+    // Receiver gets phishing_alert event
+    socket.on('phishing_alert', function (data) {
+        showPhishingToast(data.phishing_urls, data.sender_username);
+    });
+
+    // Sender gets sender_warning — show toast if it's a phishing flag
+    socket.on('sender_warning', function (data) {
+        if (data.flag_type === 'phishing' && data.phishing_results) {
+            const bad = data.phishing_results.filter(r => r.is_phishing);
+            if (bad.length) showPhishingToast(bad, 'You');
+        }
+    });
+
+    function scrollToBottom() {
+        const messagesContainer = document.getElementById('chatMessages');
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+
+    // Typing indicator
+    let typingTimer;
+    document.getElementById('messageInput').addEventListener('input', function () {
+        clearTimeout(typingTimer);
+        socket.emit('typing', { room: room, username: currentUser });
+        typingTimer = setTimeout(() => {
+            socket.emit('stop_typing', { room: room, username: currentUser });
+        }, 1000);
+    });
+
+    socket.on('typing', function (data) {
+        if (data.username !== currentUser)
+            document.getElementById('typingIndicator').style.display = 'flex';
+    });
+
+    socket.on('stop_typing', function (data) {
+        if (data.username !== currentUser)
+            document.getElementById('typingIndicator').style.display = 'none';
+    });
+
+    window.addEventListener('load', scrollToBottom);
+
+    window.addEventListener('beforeunload', function () {
+        socket.emit('leave', { username: currentUser, room: room });
+    });
+</script>
+{% endblock %}

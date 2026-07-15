@@ -1,0 +1,157 @@
+================================================================================
+          AI-POWERED CYBERCRIME & PHISHING DETECTION SYSTEM
+                       TECHNICAL DOCUMENTATION
+================================================================================
+
+This document details the datasets, model architectures, and technical 
+methodologies for the machine learning models integrated within the social 
+media and chat platform. 
+
+The system implements a dual-defense strategy:
+1. Model A: A multi-class Text-based Cybercrime & Phishing Classifier
+2. Model B: A high-throughput, tabular, URL-based Phishing Detector
+
+--------------------------------------------------------------------------------
+PART 1: MODEL A - EXPLAINABLE AI (XAI) CYBERCRIME TEXT CLASSIFIER
+--------------------------------------------------------------------------------
+
+The primary text classifier automatically scans all user posts, comments, 
+and chat messages for suspicious activity and classifies them into safety 
+or cybercrime-related categories.
+
+1. DATASET DETAILS
+   - Source: Custom security-engineered dataset, constructed by combining 
+     domain-specific cybercrime language templates with standard safe conversation 
+     corpora.
+   - Size: 4,500 total samples.
+   - Class Distribution: Perfectly balanced at 500 samples per class to prevent 
+     majority-class classification bias.
+   - Target Classes (9 Categories):
+     * financial_fraud: Scams, fake investments, illicit money transfers.
+     * phishing: Identity theft, account credential harvesting, spoofing.
+     * threats_violence: Intimidation, physical harm threats, domestic threats.
+     * cyberbullying: Online harassment, abuse, targeted hate speech.
+     * illegal_drugs: Online trafficking, sale, and distribution of substances.
+     * weapons_trafficking: Illicit weapon sales, modifying guides, smuggling.
+     * identity_theft: Explicit SSN, ID, or credit card harvesting scams.
+     * romance_scam: Relationship-building scams for financial exploitation.
+     * safe: Legitimate, normal interactions and conversations.
+
+2. PREPROCESSING PIPELINE
+   - Case Normalization: Converts all incoming text to lowercase.
+   - Punctuation Filtering: Retains critical emphasis and currency symbols 
+     (!, ?, $, €, £) while removing general special characters to prevent noise.
+   - Tokenization: Splits text into semantic units (NLTK word_tokenize).
+   - Smart Stopword Removal: Filters standard English stopwords (NLTK stopwords) 
+     but strictly preserves a curated whitelist of 14 crime-critical words:
+     ['kill', 'murder', 'bomb', 'gun', 'weapon', 'money', 'bitcoin', 'transfer', 
+      'payment', 'fraud', 'scam', 'threat', 'violence']
+   - Lemmatization: Reduces words to their morphological base form using the 
+     NLTK WordNetLemmatizer to capture semantic overlap (e.g., "stole", "stealing", 
+     "stolen" mapped to "steal").
+
+3. FEATURE EXTRACTION
+   - Vectorization: TF-IDF (Term Frequency - Inverse Document Frequency) 
+     weighting scheme to prioritize unique, contextually rich words over common ones.
+   - N-Gram Range: 1 to 3 words (captures unigrams, bigrams, and trigrams, e.g., 
+     "need", "need money", "available send").
+   - Vocabulary Size: Set to a maximum of 10,000 features. 
+   - Document Frequency Constraints: min_df=1 (allows rare but crucial crime terms), 
+     max_df=0.9 (discards universally frequent terms).
+   - Term Frequency Scaling: Sublinear TF scaling enabled (sublinear_tf=True) 
+     applying 1 + log(TF) to dampen the influence of extreme keyword repetitions.
+
+4. MODEL ARCHITECTURE
+   - Algorithm: Random Forest Classifier (ensemble of decision tree estimators).
+   - Configuration Details:
+     * Estimators (n_estimators): 200 trees for robust ensemble variance reduction.
+     * Tree Depth (max_depth): 40 (high capacity for complex phrase matching).
+     * Split Constraints: min_samples_split=2, min_samples_leaf=1.
+     * Class Weight: 'balanced' (provides automatic class weight adjustments).
+     * Jobs: n_jobs=-1 (multi-core parallelized training).
+     * Random Seed: 42 (for absolute reproducibility).
+
+5. EXPLAINABLE AI (XAI) INTEGRATION
+   Post-hoc interpretability explainers are initialized directly during training:
+   - LIME (Local Interpretable Model-agnostic Explanations): Uses a local 
+     surrogate model to approximate the Random Forest boundary around a single 
+     text prediction, highlighting the specific words contributing for/against 
+     each class.
+   - SHAP (SHapley Additive exPlanations): Uses coalitional game theory 
+     (TreeExplainer/KernelExplainer) to calculate Shapley values, distributing the 
+     overall prediction score fairly among the active TF-IDF text features.
+
+6. EVALUATION METRICS
+   - Split Strategy: 80/20 train/test stratified split.
+   - Overall Accuracy: ~92.2% on the multi-class test dataset.
+   - Performance Characteristics: Strong precision and recall values for critical 
+     crime categories, with an aggressive manual safety override built in to 
+     mitigate false negatives on high-risk phrases.
+
+
+--------------------------------------------------------------------------------
+PART 2: MODEL B - URL-BASED PHISHING DETECTOR
+--------------------------------------------------------------------------------
+
+The URL scanner operates in real time within the chat pipeline, analyzing any 
+hyperlink shared in private messages before the user is allowed to click it.
+
+1. DATASET DETAILS
+   - Source: The PhiUSIIL Phishing URL Dataset, a highly respected, modern, 
+     peer-reviewed reference corpus for phishing and benign web link analysis.
+   - Size: 235,795 total instances.
+   - Class Breakdown:
+     * Phishing (Class 0): 101,230 samples (~43%)
+     * Legitimate (Class 1): 134,565 samples (~57%)
+   - Input Features: 56 statistical, structural, and page-derived metrics.
+
+2. PREPROCESSING & FEATURE SELECTION
+   - Metadata Removal: 5 non-generalizable columns are dropped prior to training:
+     ['FILENAME', 'URL', 'Domain', 'TLD', 'Title'].
+   - Final Training Dimension: 50 numerical and boolean features.
+   - Feature Engineering (URL Lexical Features):
+     * Structural Counts: URLLength, DomainLength, NoOfSubDomain, TLDLength.
+     * Obfuscation Metrics: HasObfuscation (percent-encoded check), 
+       NoOfObfuscatedChar, ObfuscationRatio.
+     * Character Ratios: NoOfLettersInURL, LetterRatioInURL, NoOfDegitsInURL, 
+       DegitRatioInURL.
+     * Special Characters: Equals (=), Question Marks (?), Ampersands (&), and 
+       others.
+     * Host/Entropy Check: IsDomainIP (binary), URLCharProb (character entropy), 
+       CharContinuationRate (duplicate adjacent chars).
+     * Protocol check: IsHTTPS (secure vs insecure scheme).
+     * TLD legitimacy probability: TLDLegitimateProb (historical probability of TLD safety).
+     * Lexical Keyword Searches: Binary indicators for banking, payment, and crypto 
+       keywords in the URL string ('bank', 'login', 'paypal', 'wallet', etc.).
+   - Page-Level Features Strategy:
+     To avoid the high latency of real-time HTML fetching during chat delivery, 
+     the inference script embeds 25 page-level features (e.g. NoOfiFrame, 
+     NoOfPopup, NoOfCSS) set to their training median values. This ensures low-latency, 
+     domain-focused real-time inference without high false-positive rates.
+
+3. MODEL ARCHITECTURE
+   - Algorithm: Tabular Random Forest Classifier.
+   - Training Hyperparameters:
+     * Estimators (n_estimators): 100 trees.
+     * Split Criteria: Gini impurity.
+     * Jobs: n_jobs=-1 (full multi-core utilization).
+     * Random Seed: 42.
+
+4. EVALUATION & ACCURACY
+   - Split Strategy: 80/20 train/test stratified split.
+   - Train Sample Size: 188,636 instances.
+   - Test Sample Size: 47,159 instances.
+   - Overall Accuracy: 100.00% (or >99.98% in floating-point precision) on the 
+     stratified PhiUSIIL test partition.
+   - Evaluation Breakdown:
+     * Precision: 1.00 (Phishing) / 1.00 (Legitimate)
+     * Recall: 1.00 (Phishing) / 1.00 (Legitimate)
+     * F1-Score: 1.00 (Phishing) / 1.00 (Legitimate)
+
+5. COMPLEMENTARY SECURITY FEATURES
+   - Local Whitelisting: Built-in bypass check for local development loops and 
+     private subnets (localhost, 127.0.0.1, 10.x.x.x, 192.168.x.x, etc.) so internal 
+     network diagnostics are never flagged as malicious.
+   - Confidence thresholding: Exposes raw model prediction probability as an 
+     intuitive security rating in the chat interface (e.g., "98.5% match").
+================================================================================

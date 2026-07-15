@@ -1,0 +1,463 @@
+{% extends "base.html" %}
+
+{% block title %}Discover People - INSTAShare{% endblock %}
+
+{% block content %}
+<div class="people-container px-3">
+    <div class="container">
+        <!-- Page Header -->
+        <div class="row justify-content-center mb-5">
+            <div class="col-lg-10 col-xl-8">
+                <div class="people-header" data-aos="fade-down">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <h2 class="text-white"><i class="fas fa-users-viewfinder me-2 text-primary"></i>Discover
+                                <span class="text-gradient">People</span>
+                            </h2>
+                            <p class="text-secondary mb-0">Expand your network within the global safety perimeter</p>
+                        </div>
+                        <div class="header-stats d-none d-sm-block">
+                            <span
+                                class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25 px-3 py-2">
+                                {{ users.total }} Identities Found
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="row justify-content-center mb-5">
+            <div class="col-lg-10 col-xl-8">
+                <div class="search-section" data-aos="fade-up">
+                    <form method="GET" class="search-form">
+                        <div class="search-bar">
+                            <input type="text" class="form-control search-input" name="search"
+                                value="{{ search_query }}" placeholder="Search secure database by username..."
+                                autocomplete="off">
+                            <button class="search-btn" type="submit">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </form>
+                    {% if search_query %}
+                    <div class="search-info mt-3 text-center">
+                        <small class="text-secondary">
+                            Results for "<span class="text-white fw-bold">{{ search_query }}</span>"
+                            <a href="{{ url_for('people') }}"
+                                class="ms-3 text-primary text-decoration-none small fw-bold">
+                                <i class="fas fa-times me-1"></i>Reset Library
+                            </a>
+                        </small>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Users Grid -->
+        <div class="row justify-content-center">
+            <div class="col-lg-10 col-xl-8">
+                {% if users.items %}
+                <div class="people-grid">
+                    {% for user in users.items %}
+                    <div class="person-card" data-user-id="{{ user.id }}" data-aos="zoom-in">
+                        <div class="person-header">
+                            <a href="{{ url_for('profile', username=user.username) }}" class="profile-link">
+                                <div class="person-avatar-modern">
+                                    {{ user.username[0].upper() }}
+                                </div>
+                            </a>
+
+                            <div class="person-info">
+                                <h6 class="person-username mb-1">
+                                    <a href="{{ url_for('profile', username=user.username) }}"
+                                        class="text-white text-decoration-none">
+                                        {{ user.username }}
+                                    </a>
+                                </h6>
+                                {% if user.bio %}
+                                <p class="person-bio text-secondary small">{{ user.bio[:80] }}{% if user.bio|length > 80
+                                    %}...{% endif %}</p>
+                                {% else %}
+                                <p class="person-bio text-secondary opacity-75 small italic">System ID ready for
+                                    connection</p>
+                                {% endif %}
+                            </div>
+
+                            <div class="person-actions">
+                                {% if current_user.is_following(user) %}
+                                <button class="btn btn-outline-secondary btn-sm rounded-pill px-3"
+                                    onclick="followUser('{{ user.username }}', this)"
+                                    data-username="{{ user.username }}">
+                                    Following
+                                </button>
+                                {% else %}
+                                <button class="btn btn-primary btn-sm rounded-pill px-3"
+                                    onclick="followUser('{{ user.username }}', this)"
+                                    data-username="{{ user.username }}">
+                                    Follow
+                                </button>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="person-stats-modern py-3">
+                            <div class="stat-item-modern">
+                                <span class="num">{{ user.posts_count() }}</span>
+                                <span class="lbl">Signals</span>
+                            </div>
+                            <div class="stat-item-modern">
+                                <span class="num">{{ user.followers_count() }}</span>
+                                <span class="lbl">Connections</span>
+                            </div>
+                            <div class="stat-item-modern">
+                                <span class="num">{{ user.following_count() }}</span>
+                                <span class="lbl">Following</span>
+                            </div>
+                        </div>
+
+                        {% if user.recent_posts %}
+                        <div class="person-preview-modern mt-3">
+                            <div class="preview-posts-modern">
+                                {% for post in user.recent_posts[:3] %}
+                                <a href="{{ url_for('profile', username=user.username) }}" class="preview-post-modern">
+                                    <img src="{{ url_for('uploaded_file', filename='posts/' + post.image_filename) }}"
+                                        alt="Signal" class="preview-img-modern">
+                                </a>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Pagination -->
+                {% if users.pages > 1 %}
+                <div class="pagination-section-modern mt-5">
+                    <nav aria-label="People pagination">
+                        <ul class="pagination justify-content-center">
+                            {% if users.has_prev %}
+                            <li class="page-item">
+                                <a class="page-link"
+                                    href="{{ url_for('people', page=users.prev_num, search=search_query) }}">
+                                    <i class="fas fa-chevron-left"></i>
+                                </a>
+                            </li>
+                            {% endif %}
+
+                            {% for page_num in users.iter_pages() %}
+                            {% if page_num %}
+                            <li class="page-item {{ 'active' if page_num == users.page else '' }}">
+                                <a class="page-link" href="{{ url_for('people', page=page_num, search=search_query) }}">
+                                    {{ page_num }}
+                                </a>
+                            </li>
+                            {% else %}
+                            <li class="page-item disabled"><span class="page-link">...</span></li>
+                            {% endif %}
+                            {% endfor %}
+
+                            {% if users.has_next %}
+                            <li class="page-item">
+                                <a class="page-link"
+                                    href="{{ url_for('people', page=users.next_num, search=search_query) }}">
+                                    <i class="fas fa-chevron-right"></i>
+                                </a>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                </div>
+                {% endif %}
+
+                {% else %}
+                <!-- Empty State -->
+                <div class="empty-feed py-5" data-aos="zoom-in">
+                    <div class="empty-feed-icon">
+                        <i class="fas {{ 'fa-search' if search_query else 'fa-users' }}"></i>
+                    </div>
+                    <h4>{{ 'No Identities Found' if search_query else 'No one to discover' }}</h4>
+                    <p class="text-muted">
+                        {% if search_query %}
+                        Adjust your parameters or <a href="{{ url_for('people') }}" class="text-primary fw-bold">view
+                            all members</a>
+                        {% else %}
+                        Expand the network by inviting more verified users.
+                        {% endif %}
+                    </p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Follow user function
+    function followUser(username, button) {
+        const originalText = button.textContent;
+        const isCurrentlyFollowing = button.classList.contains('btn-outline-secondary');
+
+        button.disabled = true;
+        button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+        fetch(`/api/follow/${username}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    if (data.is_following) {
+                        button.textContent = 'Following';
+                        button.className = 'btn btn-outline-secondary btn-sm follow-btn';
+                    } else {
+                        button.textContent = 'Follow';
+                        button.className = 'btn btn-primary btn-sm follow-btn';
+                    }
+
+                    // Update follower count in the card
+                    const personCard = button.closest('.person-card');
+                    const followersStatNumber = personCard.querySelector('.stat:nth-child(2) .stat-number');
+                    if (followersStatNumber) {
+                        followersStatNumber.textContent = data.followers_count;
+                    }
+
+                    // Show brief success message
+                    showTemporaryMessage(data.message, 'success');
+                } else {
+                    button.textContent = originalText;
+                    showTemporaryMessage(data.error || 'Failed to update follow status', 'error');
+                }
+                button.disabled = false;
+            })
+            .catch(error => {
+                console.error('Error following user:', error);
+                button.textContent = originalText;
+                button.disabled = false;
+                showTemporaryMessage('Failed to update follow status', 'error');
+            });
+    }
+
+    // Show temporary message
+    function showTemporaryMessage(message, type = 'info') {
+        const alertDiv = document.createElement('div');
+        alertDiv.className = `alert alert-${type === 'error' ? 'danger' : 'success'} alert-dismissible fade show position-fixed`;
+        alertDiv.style.cssText = 'top: 100px; right: 20px; z-index: 9999; min-width: 300px;';
+        alertDiv.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+
+        document.body.appendChild(alertDiv);
+
+        // Auto-remove after 3 seconds
+        setTimeout(() => {
+            if (alertDiv.parentNode) {
+                alertDiv.remove();
+            }
+        }, 3000);
+    }
+
+    // Search functionality
+    document.addEventListener('DOMContentLoaded', function () {
+        const searchInput = document.querySelector('.search-input');
+
+        if (searchInput) {
+            // Focus search input on Ctrl+K / Cmd+K
+            document.addEventListener('keydown', function (e) {
+                if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+                    e.preventDefault();
+                    searchInput.focus();
+                }
+            });
+
+            // Auto-focus if there's a search query
+            if (searchInput.value.trim()) {
+                searchInput.focus();
+            }
+        }
+    });
+</script>
+
+<style>
+    .people-container {
+        padding-top: 100px;
+        min-height: 100vh;
+    }
+
+    .people-header {
+        background: var(--bg-card);
+        border: 1px solid var(--glass-border);
+        border-radius: var(--border-radius);
+        padding: 30px;
+        backdrop-filter: blur(10px);
+    }
+
+    .search-section {
+        background: var(--bg-card);
+        border: 1px solid var(--glass-border);
+        border-radius: var(--border-radius);
+        padding: 24px;
+        backdrop-filter: blur(10px);
+    }
+
+    .search-bar {
+        background: var(--bg-deep);
+        border: 1px solid var(--glass-border);
+        border-radius: 50px;
+        padding: 5px 10px;
+        display: flex;
+        align-items: center;
+        transition: var(--transition);
+    }
+
+    .search-bar:focus-within {
+        border-color: var(--primary-color);
+        box-shadow: var(--shadow-glow);
+    }
+
+    .search-input {
+        background: transparent !important;
+        border: none !important;
+        color: var(--text-main) !important;
+        padding: 12px 20px !important;
+    }
+
+    .search-input:focus {
+        box-shadow: none !important;
+    }
+
+    .search-btn {
+        background: var(--gradient-primary);
+        color: white;
+        border: none;
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: var(--transition);
+    }
+
+    .people-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: 20px;
+    }
+
+    .person-card {
+        background: var(--bg-card);
+        border: 1px solid var(--glass-border);
+        border-radius: var(--border-radius);
+        padding: 25px;
+        transition: var(--transition);
+        backdrop-filter: blur(10px);
+    }
+
+    .person-card:hover {
+        transform: translateY(-5px);
+        border-color: var(--primary-color);
+        box-shadow: var(--shadow-medium);
+    }
+
+    .person-header {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+
+    .person-avatar-modern {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: var(--gradient-primary);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        font-weight: 800;
+    }
+
+    .person-stats-modern {
+        display: flex;
+        justify-content: space-around;
+        border-top: 1px solid var(--glass-border);
+        border-bottom: 1px solid var(--glass-border);
+    }
+
+    .stat-item-modern {
+        text-align: center;
+    }
+
+    .stat-item-modern .num {
+        display: block;
+        font-weight: 800;
+        color: var(--text-main);
+        font-size: 1.1rem;
+    }
+
+    .stat-item-modern .lbl {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .preview-posts-modern {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+    }
+
+    .preview-post-modern {
+        aspect-ratio: 1;
+        border-radius: 12px;
+        overflow: hidden;
+        cursor: pointer;
+    }
+
+    .preview-img-modern {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: var(--transition);
+    }
+
+    .preview-post-modern:hover .preview-img-modern {
+        transform: scale(1.1);
+    }
+
+    .pagination-section-modern .page-link {
+        background: var(--bg-card);
+        border: 1px solid var(--glass-border);
+        color: var(--text-main);
+        margin: 0 5px;
+        border-radius: 10px;
+        padding: 10px 18px;
+    }
+
+    .pagination-section-modern .page-item.active .page-link {
+        background: var(--gradient-primary);
+        border: none;
+    }
+
+    @media (max-width: 768px) {
+        .people-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+```

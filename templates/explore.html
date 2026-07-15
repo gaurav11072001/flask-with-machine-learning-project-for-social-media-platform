@@ -1,0 +1,728 @@
+{% extends "base.html" %}
+
+{% block title %}Explore - INSTAShare{% endblock %}
+
+{% block content %}
+<div class="explore-container px-3">
+    <div class="container">
+        <!-- Search Bar -->
+        <div class="row justify-content-center mb-5">
+            <div class="col-lg-8 col-xl-6">
+                <div class="search-section" data-aos="fade-down">
+                    <div class="search-bar">
+                        <input type="text" class="form-control search-input"
+                            placeholder="Search secure intelligence, hashtags..." id="searchInput">
+                        <button class="search-btn">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- People to Follow -->
+        <div class="row mb-5">
+            <div class="col-12">
+                <div class="trending-section" data-aos="fade-up">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h5 class="section-title mb-0 text-white">
+                            <i class="fas fa-user-shield me-2 text-primary"></i>Trusted Identities
+                        </h5>
+                        <a href="{{ url_for('people') }}" class="see-all-link">
+                            See All <i class="fas fa-chevron-right ms-1"></i>
+                        </a>
+                    </div>
+                    <div class="people-scroll" id="peopleToFollow">
+                        <div class="text-center py-4 w-100">
+                            <div class="spinner-border text-primary" role="status"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Trending Hashtags -->
+        {% if hashtags %}
+        <div class="row mb-5">
+            <div class="col-12">
+                <div class="trending-section" data-aos="fade-up">
+                    <h5 class="section-title text-white">
+                        <i class="fas fa-fire me-2 text-danger"></i>Trending Signals
+                    </h5>
+                    <div class="hashtags-scroll">
+                        {% for hashtag in hashtags %}
+                        <div class="hashtag-card" onclick="searchHashtag('{{ hashtag.name }}')">
+                            <div class="hashtag-icon">
+                                <i class="fas fa-hashtag"></i>
+                            </div>
+                            <div class="hashtag-info">
+                                <span class="hashtag-name">#{{ hashtag.name }}</span>
+                                <span class="hashtag-count text-secondary">{{ hashtag.posts_count }} signals</span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Posts Grid -->
+        <div class="row">
+            <div class="col-12">
+                <div class="explore-posts-grid">
+                    {% if posts %}
+                    <div class="posts-masonry" id="postsGrid">
+                        {% for post in posts %}
+                        <div class="masonry-item" onclick="openPostModal('{{ post.id }}')" data-aos="zoom-in">
+                            <div class="explore-post-card">
+                                {% if post.image_filename.lower().endswith(('.mp4', '.mov', '.avi')) %}
+                                <div class="post-video-indicator">
+                                    <i class="fas fa-play"></i>
+                                </div>
+                                <video class="explore-media">
+                                    <source
+                                        src="{{ url_for('uploaded_file', filename='posts/' + post.image_filename) }}"
+                                        type="video/mp4">
+                                </video>
+                                {% else %}
+                                <img src="{{ url_for('uploaded_file', filename='posts/' + post.image_filename) }}"
+                                    alt="Post" class="explore-media">
+                                {% endif %}
+
+                                <div class="post-overlay">
+                                    <div class="overlay-stats">
+                                        <span class="overlay-stat"><i class="fas fa-heart"></i> {{ post.likes_count()
+                                            }}</span>
+                                        <span class="overlay-stat"><i class="fas fa-comment"></i> {{
+                                            post.comments_count() }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="empty-feed py-5">
+                        <div class="empty-feed-icon"><i class="fas fa-compass"></i></div>
+                        <h4>Discover Content</h4>
+                        <p>Our secure intelligence engine is gathering more content.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Post Modal (for detailed view) -->
+<div class="modal fade" id="postModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0">
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-0" id="modalContent">
+                <!-- Post content will be loaded here -->
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Search functionality
+    document.getElementById('searchInput').addEventListener('input', function () {
+        const query = this.value.trim();
+        const suggestions = document.getElementById('searchSuggestions');
+
+        if (query.length > 0) {
+            suggestions.style.display = 'block';
+            // In a real implementation, this would fetch search suggestions via AJAX
+            performLiveSearch(query);
+        } else {
+            suggestions.style.display = 'none';
+        }
+    });
+
+    function performSearch() {
+        const query = document.getElementById('searchInput').value.trim();
+        if (query) {
+            // Implement search functionality
+            console.log('Searching for:', query);
+            // This would redirect to search results or filter current content
+        }
+    }
+
+    function performLiveSearch(query) {
+        // This would implement live search suggestions
+        // For now, we'll just show a placeholder
+        const suggestions = document.getElementById('searchSuggestions');
+        suggestions.innerHTML = `
+        <div class="suggestion-categories">
+            <div class="suggestion-category">
+                <h6>Searching for "${query}"...</h6>
+                <div class="text-muted small">Search functionality coming soon</div>
+            </div>
+        </div>
+    `;
+    }
+
+    function searchHashtag(hashtag) {
+        // Implement hashtag search
+        console.log('Searching hashtag:', hashtag);
+        document.getElementById('searchInput').value = '#' + hashtag;
+        performSearch();
+    }
+
+    function openPostModal(postId) {
+        // Open post in modal for detailed view
+        const modal = new bootstrap.Modal(document.getElementById('postModal'));
+
+        // Load post content via AJAX
+        fetch(`/api/post/${postId}`)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('modalContent').innerHTML = createPostModalContent(data);
+                modal.show();
+            })
+            .catch(error => {
+                console.error('Error loading post:', error);
+                // Fallback: redirect to post page
+                window.location.href = `/post/${postId}`;
+            });
+    }
+
+    function createPostModalContent(post) {
+        // Create modal content for post
+        return `
+        <div class="row g-0">
+            <div class="col-md-8">
+                <div class="post-media-container">
+                    ${post.is_video ?
+                `<video controls class="modal-media"><source src="${post.media_url}" type="video/mp4"></video>` :
+                `<img src="${post.media_url}" alt="Post" class="modal-media">`
+            }
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="post-details-sidebar">
+                    <div class="post-header">
+                        <img src="${post.author.avatar}" alt="${post.author.username}" class="user-avatar">
+                        <span class="username">${post.author.username}</span>
+                    </div>
+                    <div class="post-caption">
+                        <p>${post.caption || ''}</p>
+                    </div>
+                    <div class="post-comments">
+                        <!-- Comments would be loaded here -->
+                    </div>
+                    <div class="post-actions">
+                        <button class="btn btn-link" onclick="toggleLike(${post.id})">
+                            <i class="fas fa-heart"></i>
+                        </button>
+                        <button class="btn btn-link">
+                            <i class="fas fa-comment"></i>
+                        </button>
+                        <button class="btn btn-link">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    }
+
+    function loadMoreExplore() {
+        // Implement infinite scroll for explore page
+        const loadBtn = document.querySelector('.load-more-btn');
+        loadBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Loading...';
+
+        // Simulate loading
+        setTimeout(() => {
+            loadBtn.innerHTML = '<i class="fas fa-plus me-1"></i>Load More';
+            // In real implementation, this would load more posts via AJAX
+        }, 1000);
+    }
+
+    function toggleLike(postId) {
+        fetch(`/like/${postId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+            .then(response => response.json())
+            .then(data => {
+                // Update like button and count
+                console.log('Like toggled:', data);
+            });
+    }
+
+    // Masonry layout initialization
+    document.addEventListener('DOMContentLoaded', function () {
+        // Initialize masonry layout for posts grid
+        const grid = document.getElementById('postsGrid');
+        if (grid) {
+            // In a real implementation, you might use a library like Masonry.js
+            // For now, we'll use CSS Grid which handles most cases well
+        }
+
+        // Close search suggestions when clicking outside
+        document.addEventListener('click', function (e) {
+            const searchContainer = document.querySelector('.search-section');
+            const suggestions = document.getElementById('searchSuggestions');
+
+            if (!searchContainer.contains(e.target)) {
+                suggestions.style.display = 'none';
+            }
+        });
+    });
+
+    // Load people to follow
+    function loadPeopleToFollow() {
+        fetch('/api/suggestions')
+            .then(response => response.json())
+            .then(data => {
+                const peopleContainer = document.getElementById('peopleToFollow');
+
+                if (data.length === 0) {
+                    peopleContainer.innerHTML = `
+                    <div class="text-center py-3">
+                        <i class="fas fa-users text-muted mb-2" style="font-size: 2rem;"></i>
+                        <p class="text-muted mb-0">No new people to follow</p>
+                        <small class="text-muted">Check back later!</small>
+                    </div>
+                `;
+                    return;
+                }
+
+                peopleContainer.innerHTML = '';
+                data.forEach(user => {
+                    const personCard = document.createElement('div');
+                    personCard.className = 'person-card-explore';
+                    personCard.innerHTML = `
+                    <div class="person-avatar-explore" onclick="window.location.href='/profile/${user.username}'">
+                        ${user.username[0].toUpperCase()}
+                    </div>
+                    <div class="person-info-explore">
+                        <a href="/profile/${user.username}" class="person-username-explore">${user.username}</a>
+                        <small class="person-stats-explore">${user.followers_count} followers</small>
+                        <button class="btn btn-sm btn-primary follow-btn-explore" 
+                                onclick="followUserExplore('${user.username}', this)" 
+                                data-username="${user.username}">
+                            Follow
+                        </button>
+                    </div>
+                `;
+                    peopleContainer.appendChild(personCard);
+                });
+            })
+            .catch(error => {
+                console.error('Error loading people:', error);
+                document.getElementById('peopleToFollow').innerHTML = `
+                <div class="text-center py-3">
+                    <i class="fas fa-exclamation-triangle text-warning mb-2"></i>
+                    <p class="text-muted mb-0 small">Failed to load suggestions</p>
+                </div>
+            `;
+            });
+    }
+
+    // Follow user function for explore page
+    function followUserExplore(username, button) {
+        const originalText = button.textContent;
+        button.disabled = true;
+        button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+        fetch(`/api/follow/${username}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    if (data.is_following) {
+                        button.textContent = 'Following';
+                        button.className = 'btn btn-sm btn-outline-secondary follow-btn-explore';
+                    } else {
+                        button.textContent = 'Follow';
+                        button.className = 'btn btn-sm btn-primary follow-btn-explore';
+                    }
+
+                    // Update follower count
+                    const statsElement = button.parentElement.querySelector('.person-stats-explore');
+                    if (statsElement) {
+                        statsElement.textContent = `${data.followers_count} followers`;
+                    }
+
+                    // Show success message
+                    showExploreMessage(data.message, 'success');
+                } else {
+                    button.textContent = originalText;
+                    showExploreMessage(data.error || 'Failed to follow user', 'error');
+                }
+                button.disabled = false;
+            })
+            .catch(error => {
+                console.error('Error following user:', error);
+                button.textContent = originalText;
+                button.disabled = false;
+                showExploreMessage('Failed to follow user', 'error');
+            });
+    }
+
+    // Show message for explore page
+    function showExploreMessage(message, type = 'info') {
+        const alertDiv = document.createElement('div');
+        alertDiv.className = `alert alert-${type === 'error' ? 'danger' : 'success'} alert-dismissible fade show position-fixed`;
+        alertDiv.style.cssText = 'top: 100px; right: 20px; z-index: 9999; min-width: 300px;';
+        alertDiv.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+
+        document.body.appendChild(alertDiv);
+
+        // Auto-remove after 3 seconds
+        setTimeout(() => {
+            if (alertDiv.parentNode) {
+                alertDiv.remove();
+            }
+        }, 3000);
+    }
+
+    // Keyboard shortcuts
+    document.addEventListener('keydown', function (e) {
+        // Focus search with Ctrl+K or Cmd+K
+        if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+            e.preventDefault();
+            document.getElementById('searchInput').focus();
+        }
+    });
+
+    // Load people when page loads
+    document.addEventListener('DOMContentLoaded', function () {
+        loadPeopleToFollow();
+    });
+</script>
+
+<style>
+    .explore-container {
+        padding-top: 100px;
+        min-height: 100vh;
+    }
+
+    .search-bar {
+        background: var(--bg-card);
+        border: 1px solid var(--glass-border);
+        border-radius: 50px;
+        padding: 5px 15px;
+        display: flex;
+        align-items: center;
+        transition: var(--transition);
+        backdrop-filter: blur(10px);
+    }
+
+    .search-bar:focus-within {
+        border-color: var(--primary-color);
+        box-shadow: var(--shadow-glow);
+    }
+
+    .search-input {
+        background: transparent !important;
+        border: none !important;
+        color: var(--text-main) !important;
+        padding: 12px 20px !important;
+        font-weight: 500;
+    }
+
+    .search-input:focus {
+        box-shadow: none !important;
+    }
+
+    .search-btn {
+        background: var(--gradient-primary);
+        color: white;
+        border: none;
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: var(--transition);
+    }
+
+    .search-btn:hover {
+        transform: scale(1.1);
+        box-shadow: 0 0 15px rgba(139, 92, 246, 0.4);
+    }
+
+    .trending-section {
+        background: var(--bg-card);
+        border-radius: var(--border-radius);
+        padding: 24px;
+        border: 1px solid var(--glass-border);
+        backdrop-filter: blur(10px);
+    }
+
+    .section-title {
+        font-weight: 800;
+        font-size: 1.25rem;
+    }
+
+    .see-all-link {
+        color: var(--primary-color);
+        text-decoration: none;
+        font-weight: 700;
+        font-size: 0.9rem;
+        transition: var(--transition);
+    }
+
+    .see-all-link:hover {
+        color: var(--text-main);
+    }
+
+    .hashtags-scroll,
+    .people-scroll {
+        display: flex;
+        gap: 15px;
+        overflow-x: auto;
+        padding: 10px 0;
+        scrollbar-width: none;
+    }
+
+    .hashtag-card {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid var(--glass-border);
+        border-radius: var(--border-radius-sm);
+        padding: 20px;
+        min-width: 160px;
+        transition: var(--transition);
+        cursor: pointer;
+    }
+
+    .hashtag-card:hover {
+        background: rgba(255, 255, 255, 0.07);
+        border-color: var(--primary-color);
+        transform: translateY(-5px);
+    }
+
+    .hashtag-icon {
+        color: var(--primary-color);
+        font-size: 1.5rem;
+        margin-bottom: 10px;
+    }
+
+    .hashtag-name {
+        display: block;
+        font-weight: 700;
+        color: var(--text-main);
+    }
+
+    .person-card-explore {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid var(--glass-border);
+        border-radius: var(--border-radius-sm);
+        padding: 20px;
+        min-width: 180px;
+        text-align: center;
+        transition: var(--transition);
+    }
+
+    .person-card-explore:hover {
+        border-color: var(--primary-color);
+        background: rgba(255, 255, 255, 0.07);
+    }
+
+    .person-avatar-explore {
+        width: 65px;
+        height: 65px;
+        border-radius: 50%;
+        background: var(--gradient-primary);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        font-weight: 800;
+        margin: 0 auto 15px;
+    }
+
+    .person-username-explore {
+        color: var(--text-main);
+        text-decoration: none;
+        font-weight: 700;
+        display: block;
+        margin-bottom: 5px;
+    }
+
+    .follow-btn-explore {
+        background: var(--gradient-primary);
+        border: none;
+        color: white;
+        border-radius: 20px;
+        padding: 6px 20px;
+        font-weight: 700;
+        font-size: 0.85rem;
+        transition: var(--transition);
+        margin-top: 10px;
+    }
+
+    .follow-btn-explore:hover {
+        transform: scale(1.05);
+        box-shadow: 0 0 15px rgba(139, 92, 246, 0.3);
+    }
+
+    .posts-masonry {
+        column-count: 3;
+        column-gap: 20px;
+    }
+
+    .masonry-item {
+        break-inside: avoid;
+        margin-bottom: 20px;
+    }
+
+    .explore-post-card {
+        border-radius: var(--border-radius-sm);
+        overflow: hidden;
+        position: relative;
+        cursor: pointer;
+        border: 1px solid var(--glass-border);
+    }
+
+    .explore-media {
+        width: 100%;
+        display: block;
+        transition: var(--transition);
+    }
+
+    .explore-post-card:hover .explore-media {
+        transform: scale(1.05);
+    }
+
+    .post-overlay {
+        position: absolute;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.4);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: var(--transition);
+        backdrop-filter: blur(4px);
+    }
+
+    .explore-post-card:hover .post-overlay {
+        opacity: 1;
+    }
+
+    .overlay-stat {
+        color: white;
+        font-weight: 700;
+        margin: 0 10px;
+        font-size: 1.1rem;
+    }
+
+    .empty-feed-icon {
+        color: #c7c7c7;
+        margin-bottom: 1rem;
+    }
+
+    .load-more-btn {
+        border-radius: 25px;
+        padding: 0.75rem 2rem;
+        font-weight: 600;
+    }
+
+    /* Modal Styles */
+    .modal-media {
+        width: 100%;
+        height: auto;
+        max-height: 70vh;
+        object-fit: contain;
+    }
+
+    .post-details-sidebar {
+        padding: 1.5rem;
+        height: 70vh;
+        overflow-y: auto;
+    }
+
+    .post-header {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 1rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid #e9ecef;
+    }
+
+    .post-header .user-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+    }
+
+    .post-header .username {
+        font-weight: 600;
+    }
+
+    /* Mobile Responsive */
+    @media (max-width: 768px) {
+        .explore-container {
+            padding-top: 80px;
+        }
+
+        .posts-masonry {
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 0.75rem;
+        }
+
+        .hashtags-scroll {
+            padding: 0.5rem 1rem;
+            margin: 0 -1rem;
+        }
+
+        .search-input {
+            padding: 0.875rem 3rem 0.875rem 0.875rem;
+        }
+
+        .trending-section,
+        .explore-posts {
+            margin: 0 1rem 1rem;
+            border-radius: 8px;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .posts-masonry {
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 0.5rem;
+        }
+
+        .hashtag-card {
+            min-width: 120px;
+            padding: 0.75rem;
+        }
+
+        .modal-dialog {
+            margin: 0;
+            max-width: 100%;
+            height: 100vh;
+        }
+
+        .modal-content {
+            height: 100vh;
+            border-radius: 0;
+        }
+    }
+</style>
+{% endblock %}

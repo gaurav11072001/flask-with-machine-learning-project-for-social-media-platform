@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+
+{% block title %}Community Guidelines - InstaShare{% endblock %}
+
+{% block content %}
+<div class="guidelines-container">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="guidelines-header text-center mb-5">
+                    <h1><i class="fas fa-shield-alt text-primary me-3"></i>Community Guidelines</h1>
+                    <p class="lead text-muted">Creating a safe and respectful environment for everyone</p>
+                </div>
+
+                <div class="guidelines-content">
+                    <div class="guideline-section mb-5">
+                        <h3><i class="fas fa-exclamation-triangle text-danger me-2"></i>Prohibited Content</h3>
+                        <div class="alert alert-danger">
+                            <h5>NSFW & Adult Content</h5>
+                            <ul class="mb-0">
+                                <li>Nudity or sexually explicit content</li>
+                                <li>Vulgar or inappropriate images</li>
+                                <li>Adult content of any kind</li>
+                                <li>Suggestive or provocative material</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="alert alert-warning">
+                            <h5>Harmful Content</h5>
+                            <ul class="mb-0">
+                                <li>Violence or threats</li>
+                                <li>Harassment or bullying</li>
+                                <li>Hate speech or discrimination</li>
+                                <li>Illegal activities</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="guideline-section mb-5">
+                        <h3><i class="fas fa-robot text-info me-2"></i>AI Content Detection</h3>
+                        <p>Our platform uses advanced AI technology to automatically detect and block inappropriate content:</p>
+                        <ul>
+                            <li><strong>Real-time Scanning:</strong> All uploaded images are analyzed instantly</li>
+                            <li><strong>High Accuracy:</strong> Our AI can detect various forms of inappropriate content</li>
+                            <li><strong>Automatic Blocking:</strong> Violating content is immediately removed</li>
+                            <li><strong>Privacy Protected:</strong> Analysis happens locally on our servers</li>
+                        </ul>
+                    </div>
+
+                    <div class="guideline-section mb-5">
+                        <h3><i class="fas fa-check-circle text-success me-2"></i>What We Encourage</h3>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <ul>
+                                    <li>Creative and artistic content</li>
+                                    <li>Family-friendly photos</li>
+                                    <li>Travel and nature photography</li>
+                                    <li>Food and lifestyle content</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <ul>
+                                    <li>Educational and informative posts</li>
+                                    <li>Positive and uplifting content</li>
+                                    <li>Community engagement</li>
+                                    <li>Respectful interactions</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="guideline-section mb-5">
+                        <h3><i class="fas fa-gavel text-warning me-2"></i>Enforcement</h3>
+                        <p>Violations of our community guidelines may result in:</p>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="card border-warning">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-exclamation-triangle text-warning mb-2" style="font-size: 2rem;"></i>
+                                        <h5>First Violation</h5>
+                                        <p class="small">Content blocked with warning</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card border-danger">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-ban text-danger mb-2" style="font-size: 2rem;"></i>
+                                        <h5>Repeated Violations</h5>
+                                        <p class="small">Account restrictions</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card border-dark">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-user-slash text-dark mb-2" style="font-size: 2rem;"></i>
+                                        <h5>Severe Violations</h5>
+                                        <p class="small">Account suspension</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="guideline-section">
+                        <h3><i class="fas fa-question-circle text-info me-2"></i>Need Help?</h3>
+                        <p>If you have questions about our community guidelines or believe your content was incorrectly flagged:</p>
+                        <div class="text-center">
+                            <a href="/contact" class="btn btn-primary me-3">
+                                <i class="fas fa-envelope me-2"></i>Contact Support
+                            </a>
+                            <a href="/upload" class="btn btn-outline-primary">
+                                <i class="fas fa-upload me-2"></i>Try Uploading Again
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.guidelines-container {
+    padding-top: 100px;
+    padding-bottom: 50px;
+    background: #f8f9fa;
+    min-height: 100vh;
+}
+
+.guidelines-header h1 {
+    font-weight: 300;
+    color: #333;
+}
+
+.guideline-section {
+    background: white;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.guideline-section h3 {
+    color: #333;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #e9ecef;
+}
+
+.alert h5 {
+    color: inherit;
+    margin-bottom: 1rem;
+}
+
+.card {
+    transition: transform 0.2s;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+</style>
+{% endblock %}

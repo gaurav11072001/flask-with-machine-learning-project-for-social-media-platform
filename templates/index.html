@@ -1,0 +1,397 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="hero-section">
+    <div class="container">
+        <div class="row align-items-center min-vh-100">
+            <div class="col-lg-6" data-aos="fade-right" data-aos-duration="1000">
+                <div class="hero-content">
+                    Share Your World with <span class="text-gradient">INSTAShare</span>
+                    The world's most advanced social sharing platform. Seamless connectivity, AI-driven content
+                    insights, and expressive sharing for everyone.
+                    <div class="hero-buttons">
+                        <a href="{{ url_for('register') }}" class="btn btn-gradient btn-lg me-3 mb-3">
+                            <i class="fas fa-user-plus me-2"></i>Get Started
+                        </a>
+                        <a href="{{ url_for('login') }}" class="btn btn-outline-light btn-lg mb-3">
+                            <i class="fas fa-sign-in-alt me-2"></i>Sign In
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6" data-aos="fade-left" data-aos-duration="1000" data-aos-delay="200">
+                <div class="hero-visual">
+                    <div class="hero-cards">
+                        <!-- Feature Card 1 -->
+                        <div class="hero-card card-1">
+                            <div class="card-icon">
+                                <i class="fas fa-shield-halved"></i>
+                            </div>
+                            <h5>AI Protection</h5>
+                            <p>Real-time threat detection for your content</p>
+                        </div>
+
+                        <!-- Feature Card 2 -->
+                        <div class="hero-card card-2">
+                            <div class="card-icon">
+                                <i class="fas fa-brain"></i>
+                            </div>
+                            <h5>XAI Insights</h5>
+                            <p>Understand why content is flagged</p>
+                        </div>
+
+                        <!-- Feature Card 3 -->
+                        <div class="hero-card card-3">
+                            <div class="card-icon">
+                                <i class="fas fa-lock"></i>
+                            </div>
+                            <h5>Secure Chat</h5>
+                            <p>Encrypted messaging with safety alerts</p>
+                        </div>
+
+                        <!-- Feature Card 4 -->
+                        <div class="hero-card card-4">
+                            <div class="card-icon">
+                                <i class="fas fa-user-shield"></i>
+                            </div>
+                            <h5>Privacy First</h5>
+                            <p>You control your data and visibility</p>
+                        </div>
+                    </div>
+
+                    <!-- Floating Elements -->
+                    <div class="floating-elements">
+                        <div class="floating-icon icon-1">
+                            <i class="fas fa-image"></i>
+                        </div>
+                        <div class="floating-icon icon-2">
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <div class="floating-icon icon-3">
+                            <i class="fas fa-thumbs-up"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Features Section -->
+<section class="features-section py-5">
+    <div class="container">
+        <div class="row text-center mb-5">
+            <div class="col-12" data-aos="fade-up">
+                <h2 class="display-5 fw-bold mb-3 text-white">Why Choose <span class="text-gradient">INSTAShare</span>?
+                </h2>
+                <p class="lead text-muted">The ultimate platform for modern social interaction</p>
+            </div>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-4" data-aos="fade-up" data-aos-delay="100">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-camera"></i>
+                    </div>
+                    <h4 class="text-white">Share Photos & Videos</h4>
+                    <p class="text-muted">Capture and share your best moments with high-quality photos and videos that
+                        tell your story.</p>
+                </div>
+            </div>
+            <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-heart"></i>
+                    </div>
+                    <h4 class="text-white">Connect & Engage</h4>
+                    <p class="text-muted">Like, comment, and share posts from friends and discover new content from
+                        people you love.</p>
+                </div>
+            </div>
+            <div class="col-md-4" data-aos="fade-up" data-aos-delay="300">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-compass"></i>
+                    </div>
+                    <h4 class="text-white">Explore & Discover</h4>
+                    <p class="text-muted">Find trending content, explore hashtags, and discover new accounts that match
+                        your interests.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Security Section -->
+<section class="security-section py-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6" data-aos="fade-right">
+                <h3 class="display-6 fw-bold mb-4 text-white">Share Your <span class="text-gradient">Story</span></h3>
+                <div class="security-features">
+                    <div class="security-item d-flex align-items-start mb-4">
+                        <div class="security-icon bg-primary bg-opacity-10 text-primary">
+                            <i class="fas fa-images"></i>
+                        </div>
+                        <div class="ms-3">
+                            <h5 class="text-white">Beautiful Posts</h5>
+                            <p class="text-muted mb-0">Share stunning photos and videos with filters and editing tools.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="security-item d-flex align-items-start mb-4">
+                        <div class="security-icon bg-warning bg-opacity-10 text-warning">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="ms-3">
+                            <h5 class="text-white">Stories</h5>
+                            <p class="text-muted mb-0">Share temporary moments that disappear after 24 hours.</p>
+                        </div>
+                    </div>
+                    <div class="security-item d-flex align-items-start">
+                        <div class="security-icon bg-success bg-opacity-10 text-success">
+                            <i class="fas fa-hashtag"></i>
+                        </div>
+                        <div class="ms-3">
+                            <h5 class="text-white">Hashtags</h5>
+                            <p class="text-muted mb-0">Use hashtags to categorize your content and reach a wider
+                                audience.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6" data-aos="fade-left" data-aos-delay="200">
+                <div class="security-dashboard">
+                    <div class="dashboard-header border-secondary border-opacity-25">
+                        <h6 class="text-white-50"><i class="fas fa-chart-line me-2 text-primary"></i>Platform Stats</h6>
+                    </div>
+                    <div class="dashboard-stats">
+                        <div class="stat-item">
+                            <div class="stat-number text-gradient">10M+</div>
+                            <div class="stat-label text-muted">Active Users</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number text-gradient">500M+</div>
+                            <div class="stat-label text-muted">Photos Shared</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-number text-gradient">24/7</div>
+                            <div class="stat-label text-muted">Always Online</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Modern Hero Section */
+    .hero-visual {
+        position: relative;
+        padding: 2rem;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .hero-cards {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+        max-width: 400px;
+        position: relative;
+        z-index: 2;
+    }
+
+    .hero-card {
+        background: rgba(30, 41, 59, 0.7);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        padding: 1.5rem;
+        text-align: center;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        transition: all 0.3s ease;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .hero-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+        border-color: var(--primary-color);
+    }
+
+    .card-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+        font-size: 24px;
+        color: white;
+        transition: all 0.3s ease;
+    }
+
+    .card-1 .card-icon {
+        background: linear-gradient(135deg, #0ea5e9, #2563eb);
+    }
+
+    .card-2 .card-icon {
+        background: linear-gradient(135deg, #8b5cf6, #d946ef);
+    }
+
+    .card-3 .card-icon {
+        background: linear-gradient(135deg, #f59e0b, #ef4444);
+    }
+
+    .card-4 .card-icon {
+        background: linear-gradient(135deg, #10b981, #0d9488);
+    }
+
+    .hero-card h5 {
+        color: #fff;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        font-size: 1.1rem;
+    }
+
+    .hero-card p {
+        color: #94a3b8;
+        font-size: 0.9rem;
+        margin: 0;
+        line-height: 1.4;
+    }
+
+    /* Floating Elements */
+    .floating-elements {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+    }
+
+    .floating-icon {
+        position: absolute;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 18px;
+        animation: float 6s ease-in-out infinite;
+    }
+
+    .icon-1 {
+        background: rgba(225, 48, 108, 0.8);
+        top: 10%;
+        right: 10%;
+        animation-delay: 0s;
+    }
+
+    .icon-2 {
+        background: rgba(131, 58, 180, 0.8);
+        top: 60%;
+        left: 5%;
+        animation-delay: 2s;
+    }
+
+    .icon-3 {
+        background: rgba(64, 93, 230, 0.8);
+        bottom: 20%;
+        right: 20%;
+        animation-delay: 4s;
+    }
+
+    @keyframes float {
+
+        0%,
+        100% {
+            transform: translateY(0px) rotate(0deg);
+        }
+
+        50% {
+            transform: translateY(-20px) rotate(10deg);
+        }
+    }
+
+    /* Card Animations */
+    .card-1 {
+        animation: slideInUp 0.6s ease-out 0.1s both;
+    }
+
+    .card-2 {
+        animation: slideInUp 0.6s ease-out 0.2s both;
+    }
+
+    .card-3 {
+        animation: slideInUp 0.6s ease-out 0.3s both;
+    }
+
+    .card-4 {
+        animation: slideInUp 0.6s ease-out 0.4s both;
+    }
+
+    @keyframes slideInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .hero-cards {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+            max-width: 280px;
+        }
+
+        .hero-card {
+            padding: 1.2rem;
+        }
+
+        .card-icon {
+            width: 50px;
+            height: 50px;
+            font-size: 20px;
+        }
+
+        .hero-card h5 {
+            font-size: 1rem;
+        }
+
+        .hero-card p {
+            font-size: 0.85rem;
+        }
+
+        .floating-icon {
+            width: 35px;
+            height: 35px;
+            font-size: 16px;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .hero-visual {
+            padding: 1rem;
+        }
+
+        .hero-cards {
+            max-width: 250px;
+        }
+    }
+</style>
+{% endblock %}

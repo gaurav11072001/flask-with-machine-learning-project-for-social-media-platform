@@ -1,0 +1,322 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Analytics & Reports{% endblock %}
+
+{% block page_title %}Analytics & Reports{% endblock %}
+
+{% block content %}
+<!-- Overview Cards -->
+<div class="row">
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-primary shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total Users</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ analytics.users.total }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-users fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-success shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Total Content</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">
+                            {{ analytics.content.total_posts + analytics.content.total_messages }}
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-file-alt fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-warning shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Flagged Content</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">
+                            {{ analytics.content.flagged_posts + analytics.content.flagged_messages }}
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-flag fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-info shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Admin Users</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ analytics.users.admins }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-shield-alt fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts Row -->
+<div class="row">
+    <!-- User Registration Chart -->
+    <div class="col-xl-6 col-lg-7">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                <h6 class="m-0 font-weight-bold text-primary">User Registrations (Last 7 Days)</h6>
+            </div>
+            <div class="card-body">
+                <div class="chart-container">
+                    <canvas id="userRegistrationChart" data-chart="line" 
+                            data-chart-data='{
+                                "labels": [{% for day in analytics.users.daily_registrations %}"{{ day.date }}"{% if not loop.last %},{% endif %}{% endfor %}],
+                                "datasets": [{
+                                    "label": "New Users",
+                                    "data": [{% for day in analytics.users.daily_registrations %}{{ day.count }}{% if not loop.last %},{% endif %}{% endfor %}],
+                                    "backgroundColor": "rgba(78, 115, 223, 0.1)",
+                                    "borderColor": "rgba(78, 115, 223, 1)",
+                                    "borderWidth": 2,
+                                    "fill": true
+                                }]
+                            }'></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Flagged Content Chart -->
+    <div class="col-xl-6 col-lg-5">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Flagged Content (Last 7 Days)</h6>
+            </div>
+            <div class="card-body">
+                <div class="chart-container">
+                    <canvas id="flaggedContentChart" data-chart="bar" 
+                            data-chart-data='{
+                                "labels": [{% for day in analytics.content.daily_flagged %}"{{ day.date }}"{% if not loop.last %},{% endif %}{% endfor %}],
+                                "datasets": [{
+                                    "label": "Flagged Items",
+                                    "data": [{% for day in analytics.content.daily_flagged %}{{ day.count }}{% if not loop.last %},{% endif %}{% endfor %}],
+                                    "backgroundColor": "rgba(231, 74, 59, 0.8)",
+                                    "borderColor": "rgba(231, 74, 59, 1)",
+                                    "borderWidth": 1
+                                }]
+                            }'></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Detailed Statistics -->
+<div class="row">
+    <!-- Content Statistics -->
+    <div class="col-lg-6 mb-4">
+        <div class="card shadow">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-chart-pie me-2"></i>Content Statistics
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-borderless">
+                        <tbody>
+                            <tr>
+                                <td><strong>Posts</strong></td>
+                                <td>{{ analytics.content.total_posts }}</td>
+                                <td>
+                                    <span class="badge bg-{{ 'danger' if analytics.content.flagged_posts > 0 else 'success' }}">
+                                        {{ analytics.content.flagged_posts }} flagged
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>Comments</strong></td>
+                                <td>{{ analytics.content.total_comments }}</td>
+                                <td>
+                                    <span class="badge bg-{{ 'danger' if analytics.content.flagged_comments > 0 else 'success' }}">
+                                        {{ analytics.content.flagged_comments }} flagged
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>Messages</strong></td>
+                                <td>{{ analytics.content.total_messages }}</td>
+                                <td>
+                                    <span class="badge bg-{{ 'danger' if analytics.content.flagged_messages > 0 else 'success' }}">
+                                        {{ analytics.content.flagged_messages }} flagged
+                                    </span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="mt-4">
+                    <h6>Content Safety Rate</h6>
+                    {% set total_content = analytics.content.total_posts + analytics.content.total_comments + analytics.content.total_messages %}
+                    {% set flagged_content = analytics.content.flagged_posts + analytics.content.flagged_comments + analytics.content.flagged_messages %}
+                    {% set safety_rate = ((total_content - flagged_content) / total_content * 100) if total_content > 0 else 100 %}
+                    
+                    <div class="progress">
+                        <div class="progress-bar bg-{{ 'success' if safety_rate > 95 else 'warning' if safety_rate > 90 else 'danger' }}" 
+                             role="progressbar" style="width: {{ safety_rate }}%">
+                            {{ "%.1f"|format(safety_rate) }}%
+                        </div>
+                    </div>
+                    <small class="text-muted">{{ total_content - flagged_content }} safe items out of {{ total_content }} total</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Model Performance -->
+    <div class="col-lg-6 mb-4">
+        <div class="card shadow">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-robot me-2"></i>AI Model Status
+                </h6>
+            </div>
+            <div class="card-body">
+                {% if analytics.model.available %}
+                    <div class="alert alert-success">
+                        <i class="fas fa-check-circle me-2"></i>
+                        <strong>Model Status:</strong> Active and Running
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Model Accuracy</label>
+                                <div class="progress">
+                                    <div class="progress-bar bg-success" role="progressbar" style="width: 92%">
+                                        {{ analytics.model.accuracy }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Feature Count</label>
+                                <p class="mb-0">{{ analytics.model.feature_count }} features</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Detection Categories</label>
+                        <div class="d-flex flex-wrap gap-1">
+                            {% for category in analytics.model.categories %}
+                            <span class="badge bg-primary">{{ category.replace('_', ' ').title() }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="row text-center">
+                        <div class="col-4">
+                            <div class="border p-2 rounded">
+                                <i class="fas fa-eye text-info"></i>
+                                <div><strong>LIME</strong></div>
+                                <small>Local Explanations</small>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="border p-2 rounded">
+                                <i class="fas fa-chart-bar text-success"></i>
+                                <div><strong>SHAP</strong></div>
+                                <small>Global Explanations</small>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="border p-2 rounded">
+                                <i class="fas fa-shield-alt text-primary"></i>
+                                <div><strong>Real-time</strong></div>
+                                <small>Live Detection</small>
+                            </div>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>Model Status:</strong> Unavailable
+                    </div>
+                    <p class="text-muted">The AI cybercrime detection model is currently not available. Content flagging is using keyword-based detection as fallback.</p>
+                    {% if analytics.model.error %}
+                        <div class="alert alert-danger">
+                            <small><strong>Error:</strong> {{ analytics.model.error }}</small>
+                        </div>
+                    {% endif %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Export Options -->
+<div class="card shadow">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">
+            <i class="fas fa-download me-2"></i>Export & Reports
+        </h6>
+    </div>
+    <div class="card-body">
+        <p class="text-muted">Generate detailed reports for compliance, security audits, and system analysis.</p>
+        
+        <div class="row">
+            <div class="col-md-4">
+                <div class="d-grid">
+                    <button class="btn btn-outline-primary" onclick="exportData('csv', '/admin/export/users')">
+                        <i class="fas fa-users me-2"></i>Export Users (CSV)
+                    </button>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="d-grid">
+                    <button class="btn btn-outline-warning" onclick="exportData('csv', '/admin/export/flagged')">
+                        <i class="fas fa-flag me-2"></i>Export Flagged Content (CSV)
+                    </button>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="d-grid">
+                    <button class="btn btn-outline-info" onclick="exportData('json', '/admin/export/analytics')">
+                        <i class="fas fa-chart-bar me-2"></i>Export Analytics (JSON)
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Initialize charts when the page loads
+document.addEventListener('DOMContentLoaded', function() {
+    initializeCharts();
+});
+</script>
+{% endblock %}

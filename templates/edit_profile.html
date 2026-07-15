@@ -1,0 +1,627 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Profile - INSTAShare{% endblock %}
+
+{% block content %}
+<div class="edit-profile-container">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 col-xl-6">
+                <div class="edit-profile-card">
+                    <div class="profile-header">
+                        <h3><i class="fas fa-user-edit me-2"></i>Edit Profile</h3>
+                        <p class="text-muted">Make changes to your profile information</p>
+                    </div>
+
+                    <form method="POST" enctype="multipart/form-data" id="profileForm">
+                        {{ form.hidden_tag() }}
+
+                        <!-- Profile Picture Section -->
+                        <div class="profile-picture-section">
+                            <div class="current-avatar">
+                                <img src="{{ url_for('uploaded_file', filename='profiles/' + current_user.profile_pic) }}"
+                                    alt="{{ current_user.username }}" class="profile-preview" id="profilePreview"
+                                    onerror="this.src='/static/img/default-avatar.png'">
+                                <div class="avatar-overlay"
+                                    onclick="document.getElementById('profilePicInput').click()">
+                                    <i class="fas fa-camera"></i>
+                                    <span>Change</span>
+                                </div>
+                            </div>
+
+                            <div class="avatar-info">
+                                <h5>{{ current_user.username }}</h5>
+                                <button type="button" class="btn btn-link change-photo-btn"
+                                    onclick="document.getElementById('profilePicInput').click()">
+                                    Change profile photo
+                                </button>
+                                {{ form.profile_pic(class="d-none", id="profilePicInput", accept="image/*") }}
+                            </div>
+                        </div>
+
+                        <!-- Bio Section -->
+                        <div class="form-section">
+                            <label for="bio" class="form-label">Bio</label>
+                            {{ form.bio(class="form-control bio-textarea", placeholder="Write a little bit about
+                            yourself...", rows="4") }}
+                            <div class="form-text">
+                                <span id="bioCount">{{ current_user.bio|length if current_user.bio else 0 }}</span>/500
+                                characters
+                            </div>
+                        </div>
+
+                        <!-- Personal Information -->
+                        <div class="form-section">
+                            <h6 class="section-title">Personal Information</h6>
+
+                            <div class="form-group mb-3">
+                                <label for="email" class="form-label">Email</label>
+                                <input type="email" class="form-control" id="email"
+                                    value="{{ current_user.email or '' }}" placeholder="your.email@example.com">
+                            </div>
+
+                            <div class="form-group mb-3">
+                                <label for="phone" class="form-label">Phone Number</label>
+                                <input type="tel" class="form-control" id="phone" placeholder="+1 (555) 123-4567">
+                            </div>
+
+                            <div class="form-group mb-3">
+                                <label for="website" class="form-label">Website</label>
+                                <input type="url" class="form-control" id="website"
+                                    placeholder="https://your-website.com">
+                            </div>
+                        </div>
+
+                        <!-- Privacy Settings -->
+                        <div class="form-section">
+                            <h6 class="section-title">Privacy</h6>
+
+                            <div class="form-check form-switch mb-3">
+                                <input class="form-check-input" type="checkbox" id="privateAccount" {{ 'checked' if
+                                    current_user.is_private else '' }}>
+                                <label class="form-check-label" for="privateAccount">
+                                    <strong>Private Account</strong>
+                                    <div class="form-text">When your account is private, only people you approve can see
+                                        your posts and stories.</div>
+                                </label>
+                            </div>
+
+                            <div class="form-check form-switch mb-3">
+                                <input class="form-check-input" type="checkbox" id="showActivity">
+                                <label class="form-check-label" for="showActivity">
+                                    <strong>Activity Status</strong>
+                                    <div class="form-text">Allow others to see when you were last active.</div>
+                                </label>
+                            </div>
+
+                            <div class="form-check form-switch mb-3">
+                                <input class="form-check-input" type="checkbox" id="allowTagging" checked>
+                                <label class="form-check-label" for="allowTagging">
+                                    <strong>Allow Tagging</strong>
+                                    <div class="form-text">Let others tag you in their posts and stories.</div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Account Actions -->
+                        <div class="form-section">
+                            <h6 class="section-title">Account</h6>
+
+                            <div class="account-actions">
+                                <button type="button" class="btn btn-outline-primary w-100 mb-2"
+                                    onclick="changePassword()">
+                                    <i class="fas fa-key me-1"></i>Change Password
+                                </button>
+
+                                <button type="button" class="btn btn-outline-secondary w-100 mb-2"
+                                    onclick="downloadData()">
+                                    <i class="fas fa-download me-1"></i>Download Your Data
+                                </button>
+
+                                <button type="button" class="btn btn-outline-danger w-100"
+                                    onclick="deactivateAccount()">
+                                    <i class="fas fa-user-slash me-1"></i>Temporarily Deactivate Account
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Form Actions -->
+                        <div class="form-actions">
+                            <a href="{{ url_for('profile', username=current_user.username) }}"
+                                class="btn btn-outline-secondary">
+                                <i class="fas fa-times me-1"></i>Cancel
+                            </a>
+                            {{ form.submit(class="btn btn-primary", value="Save Changes") }}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Change Password Modal -->
+<div class="modal fade" id="changePasswordModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Change Password</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="passwordForm">
+                    <div class="mb-3">
+                        <label for="currentPassword" class="form-label">Current Password</label>
+                        <input type="password" class="form-control" id="currentPassword" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="newPassword" class="form-label">New Password</label>
+                        <input type="password" class="form-control" id="newPassword" required minlength="8">
+                        <div class="form-text">Password must be at least 8 characters long.</div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="confirmPassword" class="form-label">Confirm New Password</label>
+                        <input type="password" class="form-control" id="confirmPassword" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="savePassword()">Change Password</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const bioTextarea = document.querySelector('.bio-textarea');
+        const bioCount = document.getElementById('bioCount');
+        const profilePicInput = document.getElementById('profilePicInput');
+        const profilePreview = document.getElementById('profilePreview');
+
+        // Bio character count
+        bioTextarea.addEventListener('input', function () {
+            const count = this.value.length;
+            bioCount.textContent = count;
+
+            if (count > 500) {
+                bioCount.style.color = '#dc3545';
+            } else if (count > 400) {
+                bioCount.style.color = '#fd7e14';
+            } else {
+                bioCount.style.color = '#6c757d';
+            }
+        });
+
+        // Profile picture preview
+        profilePicInput.addEventListener('change', function () {
+            if (this.files && this.files[0]) {
+                const reader = new FileReader();
+
+                reader.onload = function (e) {
+                    profilePreview.src = e.target.result;
+                };
+
+                reader.readAsDataURL(this.files[0]);
+            }
+        });
+
+        // Form submission
+        document.getElementById('profileForm').addEventListener('submit', function (e) {
+            const bioLength = bioTextarea.value.length;
+            if (bioLength > 500) {
+                e.preventDefault();
+                alert('Bio must be 500 characters or less.');
+                return;
+            }
+
+            // Show loading state
+            const submitBtn = this.querySelector('input[type="submit"]');
+            submitBtn.value = 'Saving...';
+            submitBtn.disabled = true;
+        });
+    });
+
+    function changePassword() {
+        const modal = new bootstrap.Modal(document.getElementById('changePasswordModal'));
+        modal.show();
+    }
+
+    function savePassword() {
+        const currentPassword = document.getElementById('currentPassword').value;
+        const newPassword = document.getElementById('newPassword').value;
+        const confirmPassword = document.getElementById('confirmPassword').value;
+
+        if (!currentPassword || !newPassword || !confirmPassword) {
+            alert('Please fill in all password fields.');
+            return;
+        }
+
+        if (newPassword !== confirmPassword) {
+            alert('New passwords do not match.');
+            return;
+        }
+
+        if (newPassword.length < 8) {
+            alert('New password must be at least 8 characters long.');
+            return;
+        }
+
+        // In a real implementation, this would send a request to the server
+        fetch('/change-password', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                current_password: currentPassword,
+                new_password: newPassword
+            })
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Password changed successfully!');
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('changePasswordModal'));
+                    modal.hide();
+
+                    // Clear form
+                    document.getElementById('passwordForm').reset();
+                } else {
+                    alert(data.message || 'Failed to change password.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while changing password.');
+            });
+    }
+
+    function downloadData() {
+        if (confirm('Download a copy of your InstaShare data? This may take a few minutes to prepare.')) {
+            // In a real implementation, this would initiate a data export
+            alert('Your data export has been requested. You will receive an email when it is ready for download.');
+        }
+    }
+
+    function deactivateAccount() {
+        const confirmed = confirm(
+            'Are you sure you want to temporarily deactivate your account?\n\n' +
+            'Your profile, posts, comments, and likes will be hidden until you reactivate by logging in again.'
+        );
+
+        if (confirmed) {
+            const doubleConfirm = confirm('This action will deactivate your account. Are you absolutely sure?');
+
+            if (doubleConfirm) {
+                // In a real implementation, this would deactivate the account
+                alert('Account deactivation functionality would be implemented here.');
+            }
+        }
+    }
+
+    // Auto-resize bio textarea
+    document.querySelector('.bio-textarea').addEventListener('input', function () {
+        this.style.height = 'auto';
+        this.style.height = this.scrollHeight + 'px';
+    });
+</script>
+
+<style>
+    .edit-profile-container {
+        padding-top: 90px;
+        min-height: 100vh;
+        background: var(--bg-deep);
+        color: var(--text-primary);
+    }
+
+    .edit-profile-card {
+        background: var(--bg-card);
+        /* Dark card background */
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow-medium);
+        overflow: hidden;
+        border: 1px solid var(--glass-border);
+    }
+
+    .profile-header {
+        padding: 2rem 2rem 1rem;
+        text-align: center;
+        border-bottom: 1px solid var(--glass-border);
+        background: rgba(255, 255, 255, 0.02);
+    }
+
+    .profile-header h3 {
+        color: var(--text-primary);
+        font-weight: 600;
+    }
+
+    .profile-header p {
+        color: var(--text-secondary);
+    }
+
+    .profile-picture-section {
+        padding: 2rem;
+        display: flex;
+        align-items: center;
+        gap: 2rem;
+        border-bottom: 1px solid var(--glass-border);
+    }
+
+    .current-avatar {
+        position: relative;
+        flex-shrink: 0;
+    }
+
+    .profile-preview {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid var(--accent-primary);
+        padding: 2px;
+        background: var(--bg-card);
+    }
+
+    .avatar-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.6);
+        border-radius: 50%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        color: white;
+        font-size: 0.875rem;
+        font-weight: 600;
+    }
+
+    .current-avatar:hover .avatar-overlay {
+        opacity: 1;
+    }
+
+    .avatar-info h5 {
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+        color: var(--text-primary);
+    }
+
+    .change-photo-btn {
+        color: var(--primary-color);
+        text-decoration: none;
+        font-weight: 600;
+        padding: 0;
+    }
+
+    .change-photo-btn:hover {
+        color: var(--accent-color);
+        text-decoration: underline;
+    }
+
+    .form-section {
+        padding: 1.5rem 2rem;
+        border-bottom: 1px solid var(--glass-border);
+    }
+
+    .form-section:last-child {
+        border-bottom: none;
+    }
+
+    .section-title {
+        color: var(--text-primary);
+        font-size: 1rem;
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        opacity: 0.9;
+    }
+
+    .form-label {
+        color: var(--text-secondary);
+        font-weight: 500;
+    }
+
+    .bio-textarea {
+        background: var(--bg-deep);
+        border: 1px solid var(--glass-border);
+        color: var(--text-primary);
+        border-radius: 8px;
+        resize: none;
+        min-height: 100px;
+        transition: all 0.3s ease;
+    }
+
+    .bio-textarea:focus {
+        background: var(--bg-deep);
+        border-color: var(--accent-primary);
+        box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
+        color: var(--text-primary);
+    }
+
+    .form-check-label {
+        cursor: pointer;
+        color: var(--text-primary);
+    }
+
+    .form-check-label .form-text {
+        color: var(--text-muted);
+        font-size: 0.85rem;
+        margin-top: 0.25rem;
+    }
+
+    .account-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .form-actions {
+        padding: 1.5rem 2rem;
+        background: rgba(0, 0, 0, 0.2);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
+        border-top: 1px solid var(--glass-border);
+    }
+
+    .form-actions .btn {
+        min-width: 120px;
+    }
+
+    /* Form Controls Dark Mode */
+    .form-control {
+        background: var(--bg-deep);
+        border: 1px solid var(--glass-border);
+        color: var(--text-primary);
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus {
+        background: var(--bg-deep);
+        border-color: var(--accent-primary);
+        box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
+        color: var(--text-primary);
+    }
+
+    .form-control::placeholder {
+        color: var(--text-muted);
+        opacity: 0.7;
+    }
+
+    .form-text {
+        color: var(--text-muted);
+    }
+
+    .form-check-input {
+        background-color: var(--bg-deep);
+        border-color: var(--glass-border);
+    }
+
+    .form-check-input:checked {
+        background-color: var(--accent-primary);
+        border-color: var(--accent-primary);
+    }
+
+    .form-check-input:focus {
+        box-shadow: 0 0 0 0.2rem rgba(139, 92, 246, 0.25);
+    }
+
+    /* Buttons */
+    .btn {
+        border-radius: 8px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+        border: none;
+        color: white;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
+    }
+
+    .btn-outline-secondary {
+        border-color: var(--glass-border);
+        color: var(--text-secondary);
+    }
+
+    .btn-outline-secondary:hover {
+        background: rgba(255, 255, 255, 0.1);
+        color: var(--text-primary);
+        border-color: var(--text-primary);
+    }
+
+    .btn-outline-danger {
+        color: #ef4444;
+        border-color: rgba(239, 68, 68, 0.3);
+    }
+
+    .btn-outline-danger:hover {
+        background: #ef4444;
+        color: white;
+        border-color: #ef4444;
+    }
+
+    /* Mobile Styles */
+    @media (max-width: 768px) {
+        .edit-profile-container {
+            padding-top: 80px;
+        }
+
+        .edit-profile-card {
+            margin: 0 1rem;
+        }
+
+        .profile-picture-section {
+            flex-direction: column;
+            text-align: center;
+            gap: 1rem;
+        }
+
+        .form-section {
+            padding: 1rem 1.5rem;
+        }
+
+        .form-actions {
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .form-actions .btn {
+            width: 100%;
+        }
+    }
+
+    @media (max-width: 576px) {
+
+        .profile-header,
+        .form-section,
+        .form-actions {
+            padding-left: 1rem;
+            padding-right: 1rem;
+        }
+
+        .profile-preview {
+            width: 80px;
+            height: 80px;
+        }
+    }
+
+    /* Modal Styles Dark */
+    .modal-content {
+        background: var(--bg-card);
+        border: 1px solid var(--glass-border);
+        color: var(--text-primary);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    .modal-header {
+        border-bottom: 1px solid var(--glass-border);
+    }
+
+    .modal-header .btn-close {
+        filter: invert(1) grayscale(100%) brightness(200%);
+    }
+
+    .modal-footer {
+        border-top: 1px solid var(--glass-border);
+    }
+</style>
+{% endblock %}

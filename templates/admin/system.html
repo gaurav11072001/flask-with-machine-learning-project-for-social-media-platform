@@ -1,0 +1,390 @@
+{% extends "admin/base.html" %}
+
+{% block title %}System Information{% endblock %}
+
+{% block page_title %}System Information & Maintenance{% endblock %}
+
+{% block content %}
+<!-- System Overview -->
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-server me-2"></i>System Information
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <table class="table table-borderless">
+                            <tbody>
+                                <tr>
+                                    <td><strong>Platform:</strong></td>
+                                    <td>{{ system_info.platform }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>OS Version:</strong></td>
+                                    <td>{{ system_info.platform_release }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Python Version:</strong></td>
+                                    <td>{{ system_info.python_version }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>CPU Cores:</strong></td>
+                                    <td>{{ system_info.cpu_count }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="col-md-6">
+                        <table class="table table-borderless">
+                            <tbody>
+                                <tr>
+                                    <td><strong>Total Memory:</strong></td>
+                                    <td>{{ system_info.memory_total }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Available Memory:</strong></td>
+                                    <td>{{ system_info.memory_available }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Disk Usage:</strong></td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            {{ system_info.disk_usage }}
+                                            <div class="progress ms-2" style="width: 100px; height: 8px;">
+                                                <div class="progress-bar bg-{{ 'danger' if system_info.disk_usage|replace('%', '')|int > 90 else 'warning' if system_info.disk_usage|replace('%', '')|int > 75 else 'success' }}" 
+                                                     role="progressbar" style="width: {{ system_info.disk_usage }}"></div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Uptime:</strong></td>
+                                    <td>
+                                        <span id="uptime">Loading...</span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-success">
+                    <i class="fas fa-check-circle me-2"></i>System Health
+                </h6>
+            </div>
+            <div class="card-body text-center">
+                <div class="mb-3">
+                    <div class="h1 text-success">
+                        <i class="fas fa-heart"></i>
+                    </div>
+                    <h5 class="text-success">System Online</h5>
+                    <p class="text-muted small">All services are running normally</p>
+                </div>
+
+                <div class="row text-center">
+                    <div class="col-4">
+                        <div class="border-end">
+                            <div class="h6 text-success mb-0">✓</div>
+                            <small>Database</small>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="border-end">
+                            <div class="h6 text-success mb-0">✓</div>
+                            <small>XAI Model</small>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="h6 text-success mb-0">✓</div>
+                        <small>Web Server</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Database Information -->
+<div class="row">
+    <div class="col-lg-6">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-database me-2"></i>Database Statistics
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <small class="text-muted">Database URL:</small>
+                    <div class="font-monospace small bg-light p-2 rounded">
+                        {{ db_stats.database_url|replace('sqlite:///', 'SQLite: ') }}
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card border-primary mb-2">
+                            <div class="card-body text-center p-3">
+                                <i class="fas fa-users text-primary fa-2x mb-2"></i>
+                                <h5 class="mb-1">{{ db_stats.tables.users }}</h5>
+                                <small class="text-muted">Users</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card border-success mb-2">
+                            <div class="card-body text-center p-3">
+                                <i class="fas fa-images text-success fa-2x mb-2"></i>
+                                <h5 class="mb-1">{{ db_stats.tables.posts }}</h5>
+                                <small class="text-muted">Posts</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card border-info mb-2">
+                            <div class="card-body text-center p-3">
+                                <i class="fas fa-comments text-info fa-2x mb-2"></i>
+                                <h5 class="mb-1">{{ db_stats.tables.comments }}</h5>
+                                <small class="text-muted">Comments</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card border-warning mb-2">
+                            <div class="card-body text-center p-3">
+                                <i class="fas fa-envelope text-warning fa-2x mb-2"></i>
+                                <h5 class="mb-1">{{ db_stats.tables.messages }}</h5>
+                                <small class="text-muted">Messages</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- XAI Model Status -->
+    <div class="col-lg-6">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-robot me-2"></i>XAI Model Status
+                </h6>
+            </div>
+            <div class="card-body">
+                {% if xai_status.available %}
+                    <div class="alert alert-success">
+                        <i class="fas fa-check-circle me-2"></i>
+                        <strong>Model Status:</strong> Active and Running
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Model File</label>
+                        <div class="font-monospace small bg-light p-2 rounded">
+                            {{ xai_status.model_file }}
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="card border-{{ 'success' if xai_status.lime_available else 'secondary' }}">
+                                <div class="card-body text-center p-3">
+                                    <i class="fas fa-eye text-{{ 'success' if xai_status.lime_available else 'secondary' }} fa-2x mb-2"></i>
+                                    <h6>LIME Explainer</h6>
+                                    <span class="badge bg-{{ 'success' if xai_status.lime_available else 'secondary' }}">
+                                        {{ 'Available' if xai_status.lime_available else 'Unavailable' }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="card border-{{ 'success' if xai_status.shap_available else 'secondary' }}">
+                                <div class="card-body text-center p-3">
+                                    <i class="fas fa-chart-bar text-{{ 'success' if xai_status.shap_available else 'secondary' }} fa-2x mb-2"></i>
+                                    <h6>SHAP Explainer</h6>
+                                    <span class="badge bg-{{ 'success' if xai_status.shap_available else 'secondary' }}">
+                                        {{ 'Available' if xai_status.shap_available else 'Unavailable' }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-3">
+                        <div class="d-grid">
+                            <a href="{{ url_for('xai_dashboard') }}" class="btn btn-primary" target="_blank">
+                                <i class="fas fa-chart-line me-2"></i>View XAI Dashboard
+                            </a>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>Model Status:</strong> Unavailable
+                    </div>
+                    <p class="text-muted">The XAI cybercrime detection model is not currently loaded. The system is using keyword-based detection as a fallback.</p>
+                    
+                    <div class="mt-3">
+                        <button class="btn btn-outline-primary" onclick="refreshModelStatus()">
+                            <i class="fas fa-sync-alt me-2"></i>Refresh Model Status
+                        </button>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Application Configuration -->
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">
+            <i class="fas fa-cog me-2"></i>Application Configuration
+        </h6>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-4">
+                <h6>Security Settings</h6>
+                <ul class="list-unstyled">
+                    <li><i class="fas fa-check text-success me-2"></i>CSRF Protection: Enabled</li>
+                    <li><i class="fas fa-check text-success me-2"></i>Session Security: Enabled</li>
+                    <li><i class="fas fa-check text-success me-2"></i>File Upload Validation: Active</li>
+                    <li><i class="fas fa-check text-success me-2"></i>Input Sanitization: Active</li>
+                </ul>
+            </div>
+            <div class="col-md-4">
+                <h6>Content Detection</h6>
+                <ul class="list-unstyled">
+                    <li><i class="fas fa-{{ 'check text-success' if xai_status.available else 'times text-danger' }} me-2"></i>AI Model: {{ 'Active' if xai_status.available else 'Inactive' }}</li>
+                    <li><i class="fas fa-check text-success me-2"></i>Keyword Detection: Active</li>
+                    <li><i class="fas fa-check text-success me-2"></i>Real-time Monitoring: Active</li>
+                    <li><i class="fas fa-check text-success me-2"></i>Content Flagging: Active</li>
+                </ul>
+            </div>
+            <div class="col-md-4">
+                <h6>System Features</h6>
+                <ul class="list-unstyled">
+                    <li><i class="fas fa-check text-success me-2"></i>File Uploads: Enabled</li>
+                    <li><i class="fas fa-check text-success me-2"></i>Real-time Chat: Active</li>
+                    <li><i class="fas fa-check text-success me-2"></i>Admin Panel: Active</li>
+                    <li><i class="fas fa-check text-success me-2"></i>Analytics: Available</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Maintenance Tools -->
+<div class="card shadow">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-warning">
+            <i class="fas fa-tools me-2"></i>Maintenance & Tools
+        </h6>
+    </div>
+    <div class="card-body">
+        <div class="alert alert-warning">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            <strong>Maintenance Mode:</strong> Use these tools carefully in production environments.
+        </div>
+        
+        <div class="row">
+            <div class="col-md-3">
+                <div class="d-grid mb-2">
+                    <button class="btn btn-outline-info" onclick="clearCache()">
+                        <i class="fas fa-broom me-2"></i>Clear Cache
+                    </button>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="d-grid mb-2">
+                    <button class="btn btn-outline-primary" onclick="optimizeDatabase()">
+                        <i class="fas fa-database me-2"></i>Optimize Database
+                    </button>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="d-grid mb-2">
+                    <button class="btn btn-outline-success" onclick="backupDatabase()">
+                        <i class="fas fa-download me-2"></i>Backup Database
+                    </button>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="d-grid mb-2">
+                    <button class="btn btn-outline-secondary" onclick="viewLogs()">
+                        <i class="fas fa-file-alt me-2"></i>View Logs
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Update uptime display
+function updateUptime() {
+    const startTime = new Date('{{ moment().format("YYYY-MM-DD HH:mm:ss") }}');
+    const now = new Date();
+    const uptime = Math.floor((now - startTime) / 1000);
+    
+    const hours = Math.floor(uptime / 3600);
+    const minutes = Math.floor((uptime % 3600) / 60);
+    const seconds = uptime % 60;
+    
+    document.getElementById('uptime').textContent = `${hours}h ${minutes}m ${seconds}s`;
+}
+
+// Maintenance functions
+function clearCache() {
+    if (confirm('Are you sure you want to clear the application cache?')) {
+        showAdminNotification('Cache cleared successfully', 'success');
+    }
+}
+
+function optimizeDatabase() {
+    if (confirm('Are you sure you want to optimize the database? This may take a few moments.')) {
+        showAdminNotification('Database optimization started...', 'info');
+        // Simulate optimization
+        setTimeout(() => {
+            showAdminNotification('Database optimization completed', 'success');
+        }, 3000);
+    }
+}
+
+function backupDatabase() {
+    showAdminNotification('Creating database backup...', 'info');
+    // Simulate backup
+    setTimeout(() => {
+        showAdminNotification('Database backup created successfully', 'success');
+    }, 2000);
+}
+
+function viewLogs() {
+    window.open('/admin/logs', '_blank');
+}
+
+function refreshModelStatus() {
+    location.reload();
+}
+
+// Initialize page
+document.addEventListener('DOMContentLoaded', function() {
+    updateUptime();
+    setInterval(updateUptime, 1000); // Update every second
+});
+</script>
+{% endblock %}

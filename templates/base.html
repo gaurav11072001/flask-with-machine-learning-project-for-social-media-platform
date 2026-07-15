@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#030712">
+    <title>{% block title %}instashare - Advanced Sharing{% endblock %}</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <!-- AOS Animation -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+    {% block extra_head %}{% endblock %}
+
+    <!-- XAI Modal Styling -->
+    <style>
+        .lime-features .badge {
+            transition: opacity 0.3s ease;
+        }
+
+        .lime-features .badge:hover {
+            opacity: 1 !important;
+            transform: scale(1.05);
+        }
+
+        .shap-features .shap-feature {
+            border-left: 3px solid transparent;
+            padding-left: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .shap-features .shap-feature:hover {
+            background-color: rgba(0, 123, 255, 0.1);
+            border-left-color: #007bff;
+        }
+
+        .feature-name {
+            font-weight: 500;
+        }
+
+        .shap-value {
+            font-family: monospace;
+            font-weight: bold;
+        }
+
+        #senderXAISection,
+        #receiverXAISection {
+            animation: slideDown 0.3s ease-in-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-lg .modal-dialog {
+            max-width: 900px;
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+
+<body>
+    <!-- Navigation -->
+    {% block navbar %}
+    <nav class="navbar navbar-expand-lg navbar-dark navbar-glass fixed-top">
+        <div class="container">
+            <a class="navbar-brand fw-bold text-gradient" href="{{ url_for('home') }}">
+                <i class="fas fa-share-nodes me-2"></i>INSTAShare
+            </a>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-center">
+                    {% if current_user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link px-3" href="{{ url_for('feed') }}" title="Home">
+                            <i class="fas fa-home fs-5"></i>
+                            <span class="d-lg-none ms-2">Home</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link px-3" href="{{ url_for('explore') }}" title="Explore">
+                            <i class="fas fa-compass fs-5"></i>
+                            <span class="d-lg-none ms-2">Explore</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link px-3" href="{{ url_for('people') }}" title="People">
+                            <i class="fas fa-users fs-5"></i>
+                            <span class="d-lg-none ms-2">People</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link px-3" href="{{ url_for('xai_dashboard') }}" title="XAI Dashboard">
+                            <i class="fas fa-brain fs-5"></i>
+                            <span class="d-lg-none ms-2">XAI Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link px-3" href="{{ url_for('upload_post') }}" title="Create Post">
+                            <i class="fas fa-plus-square fs-5"></i>
+                            <span class="d-lg-none ms-2">Create</span>
+                        </a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link px-3 dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-comments fs-5"></i>
+                            <span class="d-lg-none ms-2">Messages</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end shadow-heavy border-0"
+                            style="min-width: 300px; background: var(--bg-surface);">
+                            <li>
+                                <h6 class="dropdown-header text-muted">Direct Messages</h6>
+                            </li>
+                            <li><a class="dropdown-item text-white" href="#" onclick="loadChatUsers()"><i
+                                        class="fas fa-search me-2 text-primary"></i>Find Users to Chat</a></li>
+                            <li>
+                                <hr class="dropdown-divider border-secondary opacity-25">
+                            </li>
+                            <div id="recent-chats">
+                                <li><small class="dropdown-item-text text-muted">No recent conversations</small></li>
+                            </div>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link px-3" href="{{ url_for('profile', username=current_user.username) }}">
+                            <div class="user-avatar-nav">
+                                {{ current_user.username[0].upper() }}
+                            </div>
+                        </a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-user me-1"></i>{{ current_user.username }}
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i>Settings</a></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li><a class="dropdown-item" href="{{ url_for('logout') }}"><i
+                                        class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+                        </ul>
+                    </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('login') }}">
+                            <i class="fas fa-sign-in-alt me-1"></i>Login
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('register') }}">
+                            <i class="fas fa-user-plus me-1"></i>Register
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+    {% endblock %}
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <div class="container mt-5 pt-4">
+        {% for message in messages %}
+        <div class="alert alert-info alert-dismissible fade show" role="alert">
+            <i class="fas fa-info-circle me-2"></i>{{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    <!-- Main Content -->
+    <main class="main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Chat Users Modal -->
+    <div class="modal fade" id="chatUsersModal" tabindex="-1" aria-labelledby="chatUsersModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-gradient-primary text-white">
+                    <h5 class="modal-title" id="chatUsersModalLabel">
+                        <i class="fas fa-users me-2"></i>Select User to Chat
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <input type="text" class="form-control" id="searchUsers" placeholder="Search users...">
+                    </div>
+                    <div id="usersList" class="list-group">
+                        <!-- Users will be loaded here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Floating Chat Window -->
+    <div id="chatWindow" class="chat-window" style="display: none;">
+        <div class="chat-header">
+            <div class="d-flex align-items-center">
+                <div class="flex-grow-1">
+                    <h6 class="mb-0" id="chatUsername">Chat</h6>
+                    <small class="text-muted" id="chatStatus">Online</small>
+                </div>
+                <div>
+                    <button class="btn btn-sm btn-outline-light me-1" onclick="minimizeChat()">
+                        <i class="fas fa-minus"></i>
+                    </button>
+                    <button class="btn btn-sm btn-outline-light" onclick="closeChat()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="chat-messages" id="chatMessages">
+            <!-- Messages will appear here -->
+        </div>
+        <div class="chat-input">
+            <div class="input-group">
+                <input type="text" class="form-control" id="messageInput" placeholder="Type a message...">
+                <button class="btn btn-primary" onclick="sendMessage()">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sender Warning Modal -->
+    <div class="modal fade" id="senderWarningModal" tabindex="-1" aria-labelledby="senderWarningModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content border-warning">
+                <div class="modal-header bg-warning text-dark">
+                    <h5 class="modal-title" id="senderWarningModalLabel">
+                        <i class="fas fa-exclamation-triangle me-2"></i><span id="senderWarningTitle">Content
+                            Warning</span>
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-warning" role="alert">
+                        <div class="row">
+                            <div class="col-md-2 text-center">
+                                <i class="fas fa-exclamation-triangle fa-3x text-warning"></i>
+                            </div>
+                            <div class="col-md-10">
+                                <h6 class="mb-2">⚠️ Your Message Was Flagged</h6>
+                                <p id="senderWarningMessage" class="mb-2">Your message has been flagged.</p>
+                                <p class="mb-0"><strong>Detected Keywords:</strong> <span
+                                        id="senderFlaggedKeywords"></span></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- XAI Prediction Section -->
+                    <div id="senderXAISection" style="display: none;">
+                        <div class="card border-info mb-3">
+                            <div class="card-header bg-info text-white">
+                                <h6 class="mb-0"><i class="fas fa-brain me-2"></i>AI Analysis Results</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <strong>Category:</strong> <span id="senderAIPrediction"
+                                            class="badge bg-secondary"></span>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <strong>Confidence:</strong>
+                                        <div class="progress" style="height: 20px;">
+                                            <div id="senderAIConfidence" class="progress-bar" role="progressbar"
+                                                style="width: 0%"></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- LIME Explanation -->
+                                <div id="senderLIMESection">
+                                    <h6><i class="fas fa-lightbulb me-2 text-warning"></i>LIME Explanation</h6>
+                                    <p class="small text-muted">These words contributed most to the AI's decision:</p>
+                                    <div id="senderLIMEFeatures" class="mb-3">
+                                        <!-- LIME features will be populated here -->
+                                    </div>
+                                </div>
+
+                                <!-- SHAP Explanation -->
+                                <div id="senderSHAPSection" style="display: none;">
+                                    <h6><i class="fas fa-chart-bar me-2 text-info"></i>SHAP Explanation</h6>
+                                    <p class="small text-muted">Feature importance analysis:</p>
+                                    <div id="senderSHAPFeatures" class="mb-3">
+                                        <!-- SHAP features will be populated here -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="text-muted small">
+                        <p class="mb-0"><i class="fas fa-info-circle me-1"></i>Our AI system analyzes messages to keep
+                            the community safe. Please review our community guidelines and be mindful of the content you
+                            share.</p>
+                    </div>
+                </div>
+                <div class="modal-footer d-flex justify-content-between">
+                    <div>
+                        <button type="button" class="btn btn-outline-info btn-sm"
+                            onclick="toggleXAIExplanation('sender')" id="senderToggleXAI">
+                            <i class="fas fa-brain me-1"></i>Show AI Analysis
+                        </button>
+                    </div>
+                    <div>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">I Understand</button>
+                        <button type="button" class="btn btn-primary" onclick="viewGuidelines()">View
+                            Guidelines</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Receiver Warning Modal -->
+    <div class="modal fade" id="receiverWarningModal" tabindex="-1" aria-labelledby="receiverWarningModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content border-danger">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="receiverWarningModalLabel">
+                        <i class="fas fa-shield-alt me-2"></i><span id="receiverWarningTitle">Safety Alert</span>
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-danger" role="alert">
+                        <div class="row">
+                            <div class="col-md-2 text-center">
+                                <i class="fas fa-shield-alt fa-3x text-danger"></i>
+                            </div>
+                            <div class="col-md-10">
+                                <h6 class="mb-2">🛡️ Potentially Harmful Content Detected</h6>
+                                <p id="receiverWarningMessage" class="mb-2">Potentially harmful content detected in this
+                                    conversation.</p>
+                                <p class="mb-2"><strong>From:</strong> <span id="receiverSenderName"></span></p>
+                                <p class="mb-0"><strong>Flagged Content:</strong> <span
+                                        id="receiverFlaggedKeywords"></span></p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- XAI Prediction Section -->
+                    <div id="receiverXAISection" style="display: none;">
+                        <div class="card border-warning mb-3">
+                            <div class="card-header bg-warning text-dark">
+                                <h6 class="mb-0"><i class="fas fa-brain me-2"></i>AI Analysis Results</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <strong>Threat Category:</strong> <span id="receiverAIPrediction"
+                                            class="badge bg-danger"></span>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <strong>Risk Level:</strong>
+                                        <div class="progress" style="height: 20px;">
+                                            <div id="receiverAIConfidence" class="progress-bar bg-danger"
+                                                role="progressbar" style="width: 0%"></div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- LIME Explanation -->
+                                <div id="receiverLIMESection">
+                                    <h6><i class="fas fa-lightbulb me-2 text-warning"></i>LIME Analysis</h6>
+                                    <p class="small text-muted">These words triggered the safety warning:</p>
+                                    <div id="receiverLIMEFeatures" class="mb-3">
+                                        <!-- LIME features will be populated here -->
+                                    </div>
+                                </div>
+
+                                <!-- SHAP Explanation -->
+                                <div id="receiverSHAPSection" style="display: none;">
+                                    <h6><i class="fas fa-chart-bar me-2 text-info"></i>SHAP Analysis</h6>
+                                    <p class="small text-muted">Detailed risk assessment:</p>
+                                    <div id="receiverSHAPFeatures" class="mb-3">
+                                        <!-- SHAP features will be populated here -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="text-muted small">
+                        <p class="mb-0"><i class="fas fa-exclamation-triangle me-1"></i>Our AI detected potentially
+                            harmful content. If you feel unsafe or believe this violates our guidelines, please report
+                            this user immediately.</p>
+                    </div>
+                </div>
+                <div class="modal-footer d-flex justify-content-between">
+                    <div>
+                        <button type="button" class="btn btn-outline-warning btn-sm"
+                            onclick="toggleXAIExplanation('receiver')" id="receiverToggleXAI">
+                            <i class="fas fa-brain me-1"></i>Show AI Analysis
+                        </button>
+                    </div>
+                    <div>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">I'm Safe</button>
+                        <button type="button" class="btn btn-warning" onclick="blockUser()">Block User</button>
+                        <button type="button" class="btn btn-danger" onclick="reportUser()">Report User</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Socket.IO -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.js"></script>
+    <!-- Moment.js -->
+    {{ moment.include_moment() }}
+    <!-- AOS Animation -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <!-- Custom JS -->
+    <script src="{{ url_for('static', filename='js/main.js') }}?v=2"></script>
+
+    {% block extra_js %}{% endblock %}
+
+    <script>
+        // Set active state for mobile bottom nav
+        document.addEventListener('DOMContentLoaded', function () {
+            const currentPath = window.location.pathname;
+            const navItems = document.querySelectorAll('.mobile-bottom-nav .nav-item');
+            navItems.forEach(item => {
+                if (item.getAttribute('href') === currentPath) {
+                    item.classList.add('active');
+                }
+            });
+        });
+    </script>
+
+    <!-- Mobile Bottom Navigation -->
+    {% if current_user.is_authenticated %}
+    <div class="mobile-bottom-nav d-lg-none">
+        <a href="{{ url_for('feed') }}" class="nav-item">
+            <i class="fas fa-home"></i>
+            <span>Home</span>
+        </a>
+        <a href="{{ url_for('explore') }}" class="nav-item">
+            <i class="fas fa-compass"></i>
+            <span>Explore</span>
+        </a>
+        <a href="{{ url_for('upload_post') }}" class="nav-item create-btn">
+            <i class="fas fa-plus"></i>
+        </a>
+        <a href="{{ url_for('xai_dashboard') }}" class="nav-item">
+            <i class="fas fa-brain"></i>
+            <span>XAI</span>
+        </a>
+        <a href="{{ url_for('profile', username=current_user.username) }}" class="nav-item">
+            <i class="fas fa-user"></i>
+            <span>Profile</span>
+        </a>
+    </div>
+    {% endif %}
+</body>
+
+</html>

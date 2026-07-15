@@ -1,0 +1,164 @@
+{% extends "base.html" %}
+
+{% block title %}Join INSTAShare • Share Your Moments{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/instagram_theme.css') }}">
+<style>
+    .main-content {
+        padding-top: 0 !important;
+        background: transparent !important;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    footer,
+    .navbar {
+        display: none !important;
+    }
+
+    .register-card {
+        width: 100%;
+        max-width: 380px;
+        margin: 20px auto;
+    }
+
+    /* Form Floating Overrides for dark theme */
+    .form-floating>label {
+        color: rgba(255, 255, 255, 0.4);
+    }
+
+    .form-floating>.form-control {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: #fff;
+        border-radius: 12px;
+    }
+
+    .form-floating>.form-control:focus {
+        background: rgba(255, 255, 255, 0.05);
+        border-color: var(--accent-primary);
+        box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.15);
+        color: #fff;
+    }
+
+    .progress {
+        background-color: rgba(255, 255, 255, 0.05);
+        border-radius: 10px;
+    }
+
+    .auth-divider {
+        display: flex;
+        align-items: center;
+        margin: 24px 0;
+        gap: 16px;
+    }
+
+    .auth-divider span {
+        color: rgba(255, 255, 255, 0.4);
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="insta-body-modern">
+    <!-- Animated Background Blobs -->
+    <div class="bg-blob blob-1"></div>
+    <div class="bg-blob blob-2"></div>
+
+    <div class="register-card">
+        <div class="insta-card">
+            <div class="logo-section">
+                <h1 class="insta-logo" style="font-size: 2.5rem;">INSTAShare</h1>
+                <p style="color: rgba(255,255,255,0.5); font-size: 14px; margin-top: 10px; font-weight: 600;">Sign up to
+                    share your moments with the world.</p>
+            </div>
+
+            <div class="form-section">
+                <form method="POST" class="needs-validation" novalidate>
+                    {{ form.hidden_tag() }}
+
+                    <div class="form-floating mb-3">
+                        {{ form.username(class="form-control", placeholder="Username") }}
+                        <label for="username">Username</label>
+                        {% if form.username.errors %}
+                        <div class="text-danger small mt-1">{% for error in form.username.errors %}{{ error }}{% endfor
+                            %}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-floating mb-3">
+                        {{ form.email(class="form-control", placeholder="Email") }}
+                        <label for="email">Email</label>
+                        {% if form.email.errors %}
+                        <div class="text-danger small mt-1">{% for error in form.email.errors %}{{ error }}{% endfor %}
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-floating mb-3">
+                        {{ form.password(class="form-control", placeholder="Password") }}
+                        <label for="password">Password</label>
+                        {% if form.password.errors %}
+                        <div class="text-danger small mt-1">{% for error in form.password.errors %}{{ error }}{% endfor
+                            %}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="password-strength mb-4">
+                        <div class="progress" style="height: 6px;">
+                            <div class="progress-bar" role="progressbar" style="width: 0%"></div>
+                        </div>
+                        <div class="mt-2 text-start">
+                            <small style="color: rgba(255,255,255,0.4); font-size: 11px;">Password Strength</small>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-insta w-100">
+                        Sign Up
+                    </button>
+
+                    <p style="font-size: 12px; color: rgba(255,255,255,0.4); margin-top: 20px;">
+                        By signing up, you agree to our <strong>Terms</strong>, <strong>Data Policy</strong> and
+                        <strong>Cookies Policy</strong>.
+                    </p>
+                </form>
+            </div>
+        </div>
+
+        <div class="insta-card" style="padding: 24px; margin-top: 16px;">
+            <p class="signup-text">
+                Have an account?
+                <a href="{{ url_for('login') }}" class="signup-link">Log In</a>
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Form validation and password strength (keeping your logic but refining for theme)
+    document.getElementById('password').addEventListener('input', function () {
+        const password = this.value;
+        const progressBar = document.querySelector('.progress-bar');
+        let strength = 0;
+        if (password.length >= 8) strength += 25;
+        if (password.match(/[a-z]+/)) strength += 25;
+        if (password.match(/[A-Z]+/)) strength += 25;
+        if (password.match(/[0-9]+/)) strength += 25;
+
+        progressBar.style.width = strength + '%';
+        progressBar.className = 'progress-bar';
+        if (strength <= 25) progressBar.style.backgroundColor = '#ef4444';
+        else if (strength <= 50) progressBar.style.backgroundColor = '#f59e0b';
+        else if (strength <= 75) progressBar.style.backgroundColor = '#3b82f6';
+        else progressBar.style.backgroundColor = '#10b981';
+    });
+</script>
+{% endblock %}

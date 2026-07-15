@@ -1,0 +1,375 @@
+/* =========================================
+   INSTAShare Premium Midnight Theme
+   Modern sided & Impactful Login
+   ========================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Outfit:wght@400;600;700;800&display=swap');
+
+:root {
+    --midnight-bg: #030712;
+    --midnight-card: rgba(17, 24, 39, 0.7);
+    --midnight-border: rgba(255, 255, 255, 0.1);
+    --accent-primary: #8b5cf6;
+    /* Violet */
+    --accent-secondary: #3b82f6;
+    /* Blue */
+    --insta-gradient: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+    --modern-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%);
+    --glass-blur: blur(20px);
+}
+
+.insta-body-modern {
+    background-color: var(--midnight-bg) !important;
+    color: #ffffff;
+    font-family: 'Outfit', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Background Blobs */
+.bg-blob {
+    position: absolute;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, rgba(0, 0, 0, 0) 70%);
+    border-radius: 50%;
+    z-index: -1;
+    filter: blur(80px);
+    animation: blobFloat 20s infinite alternate;
+}
+
+.blob-1 {
+    top: -200px;
+    left: -200px;
+    background: radial-gradient(circle, rgba(139, 92, 246, 0.2) 0%, rgba(0, 0, 0, 0) 70%);
+}
+
+.blob-2 {
+    bottom: -200px;
+    right: -200px;
+    background: radial-gradient(circle, rgba(59, 130, 246, 0.2) 0%, rgba(0, 0, 0, 0) 70%);
+}
+
+@keyframes blobFloat {
+    0% {
+        transform: translate(0, 0) scale(1);
+    }
+
+    100% {
+        transform: translate(50px, 50px) scale(1.1);
+    }
+}
+
+.insta-layout {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    max-width: 935px;
+    margin: 0 auto;
+    padding: 20px;
+    gap: 48px;
+    position: relative;
+    z-index: 1;
+}
+
+/* --- Left Side: Phone Mockups --- */
+.phones-container {
+    display: none;
+    position: relative;
+    width: 380px;
+    flex-basis: 380px;
+}
+
+@media (min-width: 876px) {
+    .phones-container {
+        display: block;
+    }
+}
+
+.css-phone-frame {
+    width: 330px;
+    height: 650px;
+    background: #000;
+    border: 12px solid #1f2937;
+    border-radius: 48px;
+    position: relative;
+    box-shadow:
+        0 25px 50px -12px rgba(0, 0, 0, 0.5),
+        0 0 0 1px rgba(255, 255, 255, 0.1);
+    overflow: hidden;
+    margin-left: auto;
+}
+
+.css-phone-frame::before {
+    content: '';
+    position: absolute;
+    top: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100px;
+    height: 28px;
+    background: #000;
+    border-radius: 20px;
+    z-index: 100;
+}
+
+.phone-screen-content {
+    width: 100%;
+    height: 100%;
+    background: #030712;
+    position: relative;
+}
+
+.phone-status-bar {
+    height: 44px;
+    padding: 12px 24px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 600;
+    position: relative;
+    z-index: 90;
+}
+
+.app-header {
+    height: 56px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    font-family: 'Inter', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: #fff;
+}
+
+.app-post {
+    margin-top: 8px;
+}
+
+.app-post-img {
+    width: 100%;
+    height: 320px;
+    background: var(--modern-gradient);
+    opacity: 0.8;
+}
+
+/* --- Right Side: Auth Forms --- */
+.auth-sidebar-container {
+    flex-grow: 1;
+    max-width: 380px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.insta-card {
+    background: var(--midnight-card);
+    backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--midnight-border);
+    border-radius: 24px;
+    padding: 40px;
+    text-align: center;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+}
+
+.logo-section {
+    margin-bottom: 32px;
+}
+
+.insta-logo {
+    font-family: 'Inter', sans-serif;
+    font-size: 2.75rem;
+    font-weight: 800;
+    letter-spacing: -1.5px;
+    background: var(--modern-gradient);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 0 10px rgba(168, 85, 247, 0.3));
+}
+
+.form-section form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.insta-input-group {
+    position: relative;
+}
+
+.insta-form-control {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    color: #fff;
+    width: 100%;
+    padding: 14px 16px;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    font-family: 'Inter', sans-serif;
+}
+
+.insta-form-control:focus {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.15);
+    outline: none;
+}
+
+.btn-insta {
+    background: var(--modern-gradient);
+    border: none;
+    border-radius: 12px;
+    color: #fff;
+    font-weight: 700;
+    font-size: 16px;
+    padding: 14px;
+    margin-top: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 10px 20px -5px rgba(168, 85, 247, 0.4);
+}
+
+.btn-insta:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 15px 30px -5px rgba(168, 85, 247, 0.6);
+    filter: brightness(1.1);
+}
+
+.btn-insta:active {
+    transform: translateY(0);
+}
+
+.or-divider {
+    display: flex;
+    align-items: center;
+    margin: 20px 0;
+    gap: 16px;
+}
+
+.line {
+    flex: 1;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.or-text {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.fb-login {
+    color: #fff;
+    font-weight: 600;
+    font-size: 14px;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 16px;
+    opacity: 0.8;
+    transition: opacity 0.3s;
+}
+
+.fb-login:hover {
+    opacity: 1;
+}
+
+.forgot-password {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 13px;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.forgot-password:hover {
+    color: var(--accent-secondary);
+}
+
+.signup-text {
+    margin: 0;
+    font-size: 15px;
+    color: rgba(255, 255, 255, 0.85);
+}
+
+.signup-link {
+    color: var(--accent-primary);
+    font-weight: 700;
+    text-decoration: none;
+    margin-left: 4px;
+}
+
+.get-app-text {
+    text-align: center;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 14px;
+    margin-top: 10px;
+}
+
+.app-stores {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 16px;
+}
+
+.app-store-img {
+    height: 40px;
+    filter: brightness(0) invert(1);
+    /* Make store icons white */
+    opacity: 0.8;
+    transition: opacity 0.3s;
+}
+
+.app-store-img:hover {
+    opacity: 1;
+}
+
+/* Animations */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.insta-card {
+    animation: fadeInUp 0.8s ease-out forwards;
+}
+
+.phones-container {
+    animation: fadeInUp 1s ease-out forwards;
+}
+
+@media (max-width: 480px) {
+    .insta-card {
+        padding: 30px 20px;
+    }
+
+    .insta-logo {
+        font-size: 2.2rem;
+    }
+
+    .auth-sidebar-container {
+        width: 100%;
+        max-width: 100%;
+    }
+}
